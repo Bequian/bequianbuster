@@ -1,8 +1,8 @@
-package com.example.bequianbuster.repository;
+package com.example.ms_videojuegos.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.bequianbuster.model.Videojuego;
+import com.example.ms_videojuegos.model.Videojuego;
 
 /**
  * findAll() - Devuelve todos los videojuegos de la base de datos.

@@ -1,13 +1,13 @@
-package com.example.bequianbuster;
+package com.example.ms_videojuegos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BequianbusterApplication {
+public class MsVideojuegosApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BequianbusterApplication.class, args);
+		SpringApplication.run(MsVideojuegosApplication.class, args);
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.example.bequianbuster.model;
+package com.example.ms_videojuegos.model;
 
 import java.math.BigDecimal;
 

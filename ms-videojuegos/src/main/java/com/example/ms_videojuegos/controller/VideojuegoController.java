@@ -1,4 +1,4 @@
-package com.example.bequianbuster.controller;
+package com.example.ms_videojuegos.controller;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-import com.example.bequianbuster.model.Videojuego;
-import com.example.bequianbuster.service.VideojuegoService;
+import com.example.ms_videojuegos.model.Videojuego;
+import com.example.ms_videojuegos.service.VideojuegoService;
 
 
 @RestController 

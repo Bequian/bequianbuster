@@ -1,11 +1,11 @@
-package com.example.bequianbuster.service;
+package com.example.ms_videojuegos.service;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import com.example.bequianbuster.model.Videojuego;
-import com.example.bequianbuster.repository.VideojuegoRepository;
+import com.example.ms_videojuegos.model.Videojuego;
+import com.example.ms_videojuegos.repository.VideojuegoRepository;
 
 @Service
 public class VideojuegoService {

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>bequianbuster</artifactId>
+	<artifactId>ms-videojuegos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>ms-videojuegos</name>
+	<description>Videojuegos microservice</description>
 	<url/>
 	<licenses>
 		<license/>
