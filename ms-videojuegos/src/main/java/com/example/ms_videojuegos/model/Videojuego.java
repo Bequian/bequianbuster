@@ -1,6 +1,7 @@
 package com.example.ms_videojuegos.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,9 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 
-
+/**
+ * Representa la entidad de un videojuego en la base de datos.
+ * Contiene los atributos y mapeos JPA correspondientes.
+ * Contiene los campos: id, titulo, desarrollador, fechaLanzamiento, plataforma, genero, descripcion, precio, stock, imagen. 
+ */
 @Entity
-@Table(name = "videojuego")
+@Table(name = "bb_videojuego")
 public class Videojuego {
 
     @Id
@@ -35,10 +40,9 @@ public class Videojuego {
 
     @Column (
         name = "FECHA_LANZAMIENTO",
-        nullable = false,
-        length = 10
+        nullable = false
     )
-    private String fechaLanzamiento;
+    private LocalDate fechaLanzamiento;
 
     @Column (
         name = "PLATAFORMA",
@@ -89,7 +93,7 @@ public class Videojuego {
             Long id, 
             String titulo, 
             String desarrollador, 
-            String fechaLanzamiento, 
+            LocalDate fechaLanzamiento, 
             String plataforma, 
             String genero, 
             String descripcion, 
@@ -123,7 +127,7 @@ public class Videojuego {
         return desarrollador;
     }
 
-    public String getFechaLanzamiento() {
+    public LocalDate getFechaLanzamiento() {
         return fechaLanzamiento;
     }
 
@@ -165,7 +169,7 @@ public class Videojuego {
         this.desarrollador = desarrollador;
     }
 
-    public void setFechaLanzamiento(String fechaLanzamiento) {
+    public void setFechaLanzamiento(LocalDate fechaLanzamiento) {
         this.fechaLanzamiento = fechaLanzamiento;
     }
 

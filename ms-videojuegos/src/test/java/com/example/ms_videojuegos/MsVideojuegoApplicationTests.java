@@ -1,10 +1,10 @@
-package com.example.bequianbuster;
+package com.example.ms_videojuegos;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BequianbusterApplicationTests {
+class MsVideojuegoApplicationTests {
 
 	@Test
 	void contextLoads() {

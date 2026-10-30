@@ -30,35 +30,63 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+		
+		<!-- Dependencias basicas del proyecto -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+		</dependency>
+
+		<!-- Spring Data JPA -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+
+		<!-- Driver JDBC Oracle -->
+
 		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ojdbc17</artifactId>
-			<scope>runtime</scope>
+   			<groupId>com.oracle.database.jdbc</groupId>
+   		 	<artifactId>ojdbc17</artifactId>
+   		 	<scope>runtime</scope>
 		</dependency>
+
+		<!-- Dependencia validación DTO por HTTP -->
+
+		<dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+		<!-- Dependencias para proteger operaciones de admin -->
+
+		<dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+		<!-- Pruebas unitarias -->
+
+		<dependency>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-test</artifactId>
+          <scope>test</scope>
+        </dependency>
+
 		<dependency>	
 			<groupId>com.oracle.database.security</groupId>
 			<artifactId>oraclepki</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>
