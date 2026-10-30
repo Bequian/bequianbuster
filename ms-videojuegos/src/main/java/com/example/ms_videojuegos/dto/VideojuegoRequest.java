@@ -1,5 +1,5 @@
 package com.example.ms_videojuegos.dto;
-
+import jakarta.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -30,7 +30,10 @@ public record VideojuegoRequest(
 
     /** La plataforma en la que está disponible el videojuego */
     @NotBlank(message = "La plataforma es obligatoria")
-    @Size(max = 50, message = "La plataforma supera los 50 caracteres") String plataforma,
+    @Pattern(
+    regexp = "PC|PS4|PS5|Xbox One|Xbox Series X\\|S|Nintendo Switch",
+    message = "Plataforma no válida. Valores permitidos: PC, PS4, PS5, Xbox One, Xbox Series X|S, Nintendo Switch"
+    ) String plataforma,
 
     /** El género del videojuego */
     @NotBlank(message = "El genero es obligatorio")

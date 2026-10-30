@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -60,6 +61,22 @@ public class VideojuegoController {
     @GetMapping("/{id}")
     public VideojuegoResponse buscarPorId(@PathVariable ("id") Long id) {
         return VideojuegoResponse.de(videojuegoService.buscarPorId(id));
+    }
+
+    /**
+     * Busca videojuegos por título (parcial), plataforma y/o género.
+     * Todos los parámetros son opcionales.
+     * Ej: GET /videojuego/buscar?titulo=witcher&plataforma=PC
+     */
+    @GetMapping("/buscar")
+    public List<VideojuegoResponse> buscar(
+            @RequestParam(name = "titulo", required = false) String titulo,
+            @RequestParam(name = "plataforma", required = false) String plataforma,
+            @RequestParam(name = "genero", required = false) String genero) {
+
+        return videojuegoService.buscar(titulo, plataforma, genero).stream()
+            .map(VideojuegoResponse::de)
+            .toList();
     }
     
     /**

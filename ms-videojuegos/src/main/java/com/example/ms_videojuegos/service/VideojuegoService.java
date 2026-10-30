@@ -48,6 +48,23 @@ public class VideojuegoService {
     }
 
     /**
+     * Busca videojuegos según los filtros proporcionados. Si un filtro es null o vacío, no se aplica.
+     * @param titulo Título del videojuego a buscar.
+     * @param plataforma Plataforma del videojuego a buscar.
+     * @param genero Género del videojuego a buscar.
+     * @return Lista de videojuegos que cumplen con los filtros.
+     */
+    @Transactional(readOnly = true)
+    public List<Videojuego> buscar(String titulo, String plataforma, String genero) {
+        return videojuegoRepository.buscar(vacioANull(titulo), vacioANull(plataforma), vacioANull(genero));
+    }
+
+    /** Convierte "" o "   " en null para que el filtro no se aplique. */
+    private String vacioANull(String valor) {
+        return (valor == null || valor.isBlank()) ? null : valor.trim();
+    }
+
+    /**
      * Busca un videojuego por su ID.
      * @param id ID del videojuego.
      * @return Videojuego encontrado.
