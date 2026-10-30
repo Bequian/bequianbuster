@@ -5,14 +5,25 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.example.ms_usuarios.repository.UserRepository;
-/** Busca la cuenta en Oracle y entrega su hash BCrypt a Spring Security. */
+
+/**
+ * Servicio de detalles de usuario para Spring Security.
+ * Busca la cuenta en la base de datos y entrega su hash BCrypt a Spring Security.
+ */
 @Service
 public class UserDetailService implements UserDetailsService {
+
+    // Repositorio de usuarios para acceder a la base de datos.
     private final UserRepository repo;
+
+    // Constructor que recibe el repositorio de usuarios.
     public UserDetailService(UserRepository repo){this.repo=repo;}
+
+    // Método que carga los detalles del usuario por nombre de usuario.
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var usuario=repo.findByUsername(username).orElseThrow(() ->
+        String normalizado = username.toLowerCase(java.util.Locale.ROOT);
+        var usuario=repo.findByUsername(normalizado).orElseThrow(() ->
             new UsernameNotFoundException("Usuario no encontrado"));
         return User.withUsername(usuario.getUsername())
             .password(usuario.getPassHash())

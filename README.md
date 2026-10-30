@@ -8,6 +8,16 @@ Sistema backend desarrollado con **Spring Boot** para gestionar el catálogo de 
 
 ## 📌 Historial de versiones
 
+### v2.1 – Semana 2: Validaciones de usuarios
+- Validación de **correo** con patrón `usuario@dominio.ext` (el `@Email` estándar aceptaba direcciones sin extensión).
+- **Política de contraseñas**: entre 8 y 72 caracteres, con al menos una mayúscula, una minúscula y un número.
+- **Username** debe comenzar con una letra.
+- Reglas centralizadas en la clase `ValidationRules`, compartidas por los DTOs y la carga inicial.
+- El enum `Rol` acepta mayúsculas o minúsculas (`cliente` → `CLIENTE`) y responde un mensaje claro ante un rol inexistente.
+- `InitUsers` valida las contraseñas de las variables de entorno con la misma política antes de crear las cuentas.
+- El login ignora mayúsculas en el username (se normaliza a minúsculas, igual que al registrar).
+- Mensajes de validación personalizados en español.
+
 ### v2.0 – Semana 2: Separación en microservicios y seguridad
 - El proyecto monolítico se separó en **dos microservicios**: `ms-videojuegos` y `ms-usuarios`.
 - Nuevo microservicio **`ms-usuarios`**: CRUD de cuentas, roles `ADMIN` / `CLIENTE` y contraseñas cifradas con **BCrypt**.
@@ -96,7 +106,8 @@ bequianbuster/
     └── src/main/java/com/example/ms_usuarios
         ├── config/                # InitUsers (carga inicial de cuentas)
         ├── controller/            # AuthController, UserController, EstadoController
-        ├── dto/                   # UserCreateRequest, UserUpdateRequest, UserResponse, ProfileResponse
+        ├── dto/                   # UserCreateRequest, UserUpdateRequest, UserResponse,
+        │                          # ProfileResponse, ValidationRules
         ├── error/                 # ErrorHandler, ErrorResponse, BussinessException
         ├── model/                 # Entidad User, enum Rol
         ├── repository/            # UserRepository
@@ -162,10 +173,39 @@ Arquitectura en capas en cada servicio: **Controller → Service → Repository 
 | Atributo | Tipo Java | Columna Oracle | Restricciones |
 |---|---|---|---|
 | id | Long | NUMBER(19) (IDENTITY) | PK, autogenerado |
-| username | String | VARCHAR2(50) | Obligatorio, único |
-| email | String | VARCHAR2(120) | Obligatorio, único, formato email |
+| username | String | VARCHAR2(50) | Obligatorio, único, se guarda en minúsculas |
+| email | String | VARCHAR2(120) | Obligatorio, único, se guarda en minúsculas |
 | passHash | String | VARCHAR2(100) | Hash BCrypt (nunca se devuelve en el JSON) |
 | rol | Rol (enum) | VARCHAR2(20) | `ADMIN` o `CLIENTE` |
+
+### Reglas de validación
+
+Las expresiones regulares están centralizadas en `dto/ValidationRules.java` y se reutilizan en los DTOs y en `InitUsers`.
+
+| Campo | Regla | Ejemplo válido | Ejemplo inválido |
+|---|---|---|---|
+| username | 3 a 50 caracteres, comienza con letra; admite letras, números, `.`, `-`, `_` | `cliente3` | `1usuario`, `ab` |
+| email | Formato `usuario@dominio.ext`, máximo 120 caracteres | `cliente3@duoc.cl` | `cliente3@duoc` |
+| password | 8 a 72 caracteres, con al menos una mayúscula, una minúscula y un número | `Clave2026` | `12345678`, `clave` |
+| rol | `ADMIN` o `CLIENTE` (sin distinguir mayúsculas) | `cliente` | `VENDEDOR` |
+
+> El máximo de 72 caracteres en la contraseña se debe a que **BCrypt solo procesa los primeros 72 bytes**.
+> En `PUT /usuarios/{id}` la contraseña es opcional: si se omite, se conserva la actual.
+
+Si un dato no cumple las reglas, la API responde **400 Bad Request** con el detalle de cada campo en `campos`:
+
+```json
+{
+  "timestamp": "2026-10-30T21:30:00Z",
+  "status": 400,
+  "mensaje": "Solicitud invalida",
+  "ruta": "/usuarios",
+  "campos": {
+    "email": "El correo debe tener un formato válido (ej: usuario@dominio.cl)",
+    "password": "La contraseña debe incluir al menos una mayúscula, una minúscula y un número"
+  }
+}
+```
 
 ### Endpoints
 
@@ -176,7 +216,7 @@ Arquitectura en capas en cada servicio: **Controller → Service → Repository 
 | POST | `/auth/login` | Autenticado | Comprueba credenciales |
 | GET | `/usuarios` | `ADMIN` | Lista las cuentas |
 | GET | `/usuarios/{id}` | `ADMIN` | Obtiene una cuenta |
-| POST | `/usuarios` | `ADMIN` | Crea una cuenta (201 / 409 si ya existe) |
+| POST | `/usuarios` | `ADMIN` | Crea una cuenta (201 / 400 / 409 si ya existe) |
 | PUT | `/usuarios/{id}` | `ADMIN` | Actualiza email, contraseña o rol |
 | DELETE | `/usuarios/{id}` | `ADMIN` | Elimina una cuenta (204) |
 
@@ -188,14 +228,16 @@ Arquitectura en capas en cada servicio: **Controller → Service → Repository 
 {
   "username": "cliente3",
   "email": "cliente3@duocplay.test",
-  "password": "{{nuevaPassword}}", //Utiliza variable de Entorno en Postman 
+  "password": "{{nuevaPassword}}",
   "rol": "CLIENTE"
 }
 ```
 
+> `{{nuevaPassword}}` es una variable de entorno de Postman, para no dejar contraseñas escritas en la colección.
+
 ### Carga inicial de cuentas
 
-Si la tabla está vacía, `InitUsers` crea tres cuentas de demostración (`admin`, `cliente1`, `cliente2`). Toma las contraseñas desde variables de entorno (mínimo 8 caracteres) y nunca las escribe en los logs.
+Si la tabla está vacía, `InitUsers` crea tres cuentas de demostración (`admin`, `cliente1`, `cliente2`). Toma las contraseñas desde variables de entorno y verifica que cumplan la **misma política** de los DTOs (8 a 72 caracteres, mayúscula, minúscula y número). Si alguna no la cumple, no crea ninguna cuenta y lo informa en el log, sin escribir nunca las contraseñas.
 
 ---
 
@@ -213,7 +255,7 @@ setx TNS_ADMIN "C:/wallets/Wallet_MiBD"
 setx DB_USER "MI_USUARIO"
 setx DB_PASSWORD "MI_CLAVE"
 
-# Carga inicial de cuentas (ms-usuarios)
+# Carga inicial de cuentas (ms-usuarios) – deben cumplir la política de contraseñas
 setx BB_ADMIN_PASS "********"
 setx BB_CLIENTE1_PASS "********"
 setx BB_CLIENTE2_PASS "********"
@@ -243,7 +285,9 @@ También se pueden iniciar desde el **Spring Boot Dashboard** de VSCode.
 
 ---
 
-## 🧪 Pruebas de seguridad en Postman
+## 🧪 Pruebas en Postman
+
+### Seguridad
 
 | Caso | Petición | Credenciales | Resultado esperado |
 |---|---|---|---|
@@ -254,6 +298,18 @@ También se pueden iniciar desde el **Spring Boot Dashboard** de VSCode.
 | Validación | `POST :8080/videojuego` con datos inválidos | `admin` | 400 Bad Request |
 | Perfil | `GET :8081/auth/perfil` | `cliente1` | 200 OK |
 
+### Validaciones de usuarios (`POST :8081/usuarios` con `admin`)
+
+| Caso | Dato enviado | Resultado esperado |
+|---|---|---|
+| Correo sin extensión | `"email": "test@duoc"` | 400 – formato de correo |
+| Contraseña débil | `"password": "12345678"` | 400 – mayúscula, minúscula y número |
+| Rol inexistente | `"rol": "VENDEDOR"` | 400 – debe ser ADMIN o CLIENTE |
+| Rol en minúsculas | `"rol": "cliente"` | 201 – se guarda como CLIENTE |
+| Username con número al inicio | `"username": "1usuario"` | 400 – debe comenzar con letra |
+| Username o correo repetido | Datos de una cuenta existente | 409 Conflict |
+| Datos válidos | Todos los campos correctos | 201 Created |
+
 ---
 
 ## 🗄️ Base de datos
@@ -263,8 +319,8 @@ El archivo `crear_videojuegos.sql` contiene:
 - 10 registros de ejemplo.
 - Una consulta de verificación.
 
-El archivo `crear_usuario.sql` contiene:
-- Creación de tabla `bb_usuaris` con restricciones (`CHECK` de rol).
+El archivo `crear_usuarios.sql` contiene:
+- La creación de la tabla `bb_usuarios` con sus restricciones (`UNIQUE` de username y email, `CHECK` de rol).
 
 ---
 

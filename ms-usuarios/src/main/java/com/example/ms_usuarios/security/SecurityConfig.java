@@ -8,14 +8,23 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 /**
- * SEMANA 2: el perfil autenticado queda disponible para otros servicios.
- * Solamente ADMIN puede consultar y modificar las cuentas de usuario.
- * Basic + CSRF desactivado SOLO para API sin cookies, practica local.
+ * Configuración de seguridad para la aplicación.
+ * Define las reglas de acceso a las rutas, la gestión de sesiones y el cifrado de contraseñas.
+ * Utiliza autenticación básica y desactiva CSRF para APIs sin cookies.
+ * Solo los usuarios con rol ADMIN pueden acceder a las rutas de administración de usuarios.
+ * El perfil autenticado queda disponible para otros servicios.
  */
 @Configuration
 public class SecurityConfig {
-    @Bean PasswordEncoder passwordEncoder(){return new BCryptPasswordEncoder();}
+    
+    // Bean para el cifrado de contraseñas usando BCrypt.
+    @Bean PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    // Bean para la configuración de la cadena de filtros de seguridad.
     @Bean SecurityFilterChain filtros(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
