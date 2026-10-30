@@ -256,13 +256,21 @@ setx DB_USER "MI_USUARIO"
 setx DB_PASSWORD "MI_CLAVE"
 
 # Carga inicial de cuentas (ms-usuarios) – deben cumplir la política de contraseñas
-setx BB_ADMIN_PASS "********"
-setx BB_CLIENTE1_PASS "********"
-setx BB_CLIENTE2_PASS "********"
+$seg = Read-Host "Clave de demostración CLIENTE1 (8+ caracteres)" -AsSecureString
+$env:BB_ADMIN_PASS = [System.Net.NetworkCredential]::new('', $seg).Password
+Remove-Variable seg
+
+$seg = Read-Host "Clave de demostración CLIENTE1 (8+ caracteres)" -AsSecureString
+$env:BB_CLIENTE1_PASS = [System.Net.NetworkCredential]::new('', $seg).Password
+Remove-Variable seg
+
+$seg = Read-Host "Clave de demostración CLIENTE2 (8+ caracteres)" -AsSecureString
+$env:BB_CLIENTE2_PASS = [System.Net.NetworkCredential]::new('', $seg).Password
+Remove-Variable seg
 
 # Opcionales (ms-videojuegos) – tienen valor por defecto
-setx BB_USERS_URL "http://localhost:8081"
-setx BB_CORS_ORIGIN "http://localhost:4200"
+BB_USERS_URL "http://localhost:8081"
+BB_CORS_ORIGIN "http://localhost:4200"
 ```
 
 ---
