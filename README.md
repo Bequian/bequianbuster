@@ -1,12 +1,21 @@
-# 🎮 BequianBuster – Sistema de Microservicios
+# 🎮 BequianBuster – Sistema Full Stack de Videojuegos
 
-Sistema backend desarrollado con **Spring Boot** para gestionar el catálogo de videojuegos de una tienda y las cuentas de sus usuarios. Está compuesto por **dos microservicios** independientes que se comunican por HTTP y persisten sus datos en una **Oracle Autonomous Database** en Oracle Cloud (OCI).
+Aplicación Full Stack para gestionar el catálogo de videojuegos de una tienda y las cuentas de sus usuarios. Está compuesta por **dos microservicios Spring Boot** que persisten sus datos en una **Oracle Autonomous Database** (OCI) y un **frontend Angular** que consume sus APIs REST.
 
 > Desarrollo Full Stack 3 – Duoc UC.
 
 ---
 
 ## 📌 Historial de versiones
+
+### v3.0 – Semana 3: Frontend Angular con patrones de diseño
+- Nuevo proyecto **`frontend-bequianbuster`** en Angular 22, conectado a los microservicios.
+- CRUD completo desde la interfaz: listar, buscar, ver detalle, crear, editar y eliminar videojuegos.
+- Login contra `ms-usuarios`, sesión con rol y opciones de administración visibles solo para `ADMIN`.
+- Patrones aplicados: **MVC**, **Facade**, **Observer** y **Singleton** (ver sección Frontend).
+- Interceptor HTTP que agrega las credenciales y un guard que protege las rutas de administración.
+- CORS habilitado en ambos microservicios para el origen `http://localhost:4200`.
+- Desarrollo en la rama `feature/frontend-angular`, integrada a `main` mediante *pull request*.
 
 ### v2.1 – Semana 2: Validaciones de usuarios
 - Validación de **correo** con patrón `usuario@dominio.ext` (el `@Email` estándar aceptaba direcciones sin extensión).
@@ -39,22 +48,22 @@ Sistema backend desarrollado con **Spring Boot** para gestionar el catálogo de 
 ## 🏗️ Arquitectura
 
 ```
-                 ┌──────────────────────┐
-   Postman  ───► │   ms-videojuegos     │  :8080
-                 │  (catálogo)          │
-                 └──────────┬───────────┘
-                            │ GET /auth/perfil (HTTP Basic)
-                            ▼
-                 ┌──────────────────────┐
-   Postman  ───► │   ms-usuarios        │  :8081
-                 │  (identidad / roles) │
-                 └──────────┬───────────┘
-                            │
-                            ▼
-              ┌───────────────────────────────┐
-              │ Oracle Autonomous Database    │
-              │  bb_videojuego · bb_usuarios  │
-              └───────────────────────────────┘
+        ┌──────────────────────────────┐
+        │  frontend-bequianbuster      │  :4200  (Angular)
+        │  navegador del usuario       │
+        └───────┬──────────────┬───────┘
+                │ HTTP + JSON  │ HTTP + JSON
+                ▼              ▼
+     ┌──────────────────┐   ┌──────────────────┐
+     │  ms-videojuegos  │──►│   ms-usuarios    │
+     │  :8080 catálogo  │   │  :8081 identidad │
+     └────────┬─────────┘   └────────┬─────────┘
+              │  GET /auth/perfil     │
+              ▼                       ▼
+       ┌─────────────────────────────────────┐
+       │  Oracle Autonomous Database (OCI)   │
+       │     bb_videojuego · bb_usuarios     │
+       └─────────────────────────────────────┘
 ```
 
 Cada microservicio es dueño de su propia tabla. `ms-videojuegos` **no consulta** la tabla de usuarios: le pide a `ms-usuarios` que valide las credenciales y le devuelva el rol.
@@ -83,6 +92,9 @@ Cada microservicio es dueño de su propia tabla. `ms-videojuegos` **no consulta*
 | Driver JDBC | ojdbc17 + oraclepki (wallet) |
 | Maven | Apache Maven 3.9.16 (wrapper incluido) |
 | Postman | Pruebas de endpoints |
+| Angular | 22 |
+| TypeScript | 6 |
+| Node.js / npm | LTS |
 
 ---
 
@@ -90,6 +102,17 @@ Cada microservicio es dueño de su propia tabla. `ms-videojuegos` **no consulta*
 
 ```
 bequianbuster/
+├── Postman/
+│   ├── Bequian Buster.postman_collection.json
+│   └── Entorno BB.postman_environment.json   # Plantilla sin contraseñas
+├── frontend-bequianbuster/        # Angular – puerto 4200
+│   └── src/app
+│       ├── models/                # Videojuego, Sesion, ErrorResponse
+│       ├── services/              # VideojuegoApi (HTTP), Auth (sesión)
+│       ├── facades/               # CatalogoFacade (patrón Facade)
+│       ├── interceptors/          # authInterceptor
+│       ├── guards/                # adminGuard
+│       └── pages/                 # catalogo, detalle, formulario, login
 ├── Archivos SQL/
 │   ├── crear_videojuegos.sql      # Tabla bb_videojuego + 10 registros
 │   └── crear_usuarios.sql         # Tabla bb_usuarios
@@ -118,6 +141,61 @@ bequianbuster/
 Arquitectura en capas en cada servicio: **Controller → Service → Repository → Base de datos**.
 
 ---
+
+## 🖥️ Frontend Angular (puerto 4200)
+
+### Equivalencia con el caso oficial
+
+La actividad plantea la gestión de *libros*. El caso se adaptó a videojuegos (autorizado por el docente), manteniendo los atributos solicitados:
+
+| Libro (pauta) | Videojuego (API y frontend) |
+|---|---|
+| ID | `id` |
+| Título | `titulo` |
+| Autor | `desarrollador` |
+| Año de publicación | `fechaLanzamiento` |
+| Género | `genero` |
+
+El modelo incluye además `plataforma`, `descripcion`, `precio`, `stock` e `imagen`.
+
+### Pantallas y operaciones
+
+| Pantalla | Ruta | Operación | Acceso |
+|---|---|---|---|
+| Catálogo y búsqueda | `/catalogo` | `GET /videojuego` y `/videojuego/buscar` | Público |
+| Detalle | `/videojuego/:id` | `GET /videojuego/{id}` | Público |
+| Nuevo videojuego | `/admin/nuevo` | `POST /videojuego` | `ADMIN` |
+| Editar videojuego | `/admin/editar/:id` | `PUT /videojuego/{id}` | `ADMIN` |
+| Eliminar (desde el catálogo) | — | `DELETE /videojuego/{id}` | `ADMIN` |
+| Login | `/login` | `POST :8081/auth/login` | Público |
+
+Las URLs de los microservicios están centralizadas en `src/environments/`.
+
+### Patrones de diseño aplicados
+
+| Patrón | Dónde | Problema que resuelve |
+|---|---|---|
+| **MVC** (arquetipo) | `models/` (Modelo), `pages/` (Vista), `facades/` + `services/` (Controlador) | Separa los datos, la presentación y la lógica, para que cada archivo tenga una sola responsabilidad |
+| **Facade** | `facades/catalogo-facade.ts` | Los componentes llaman métodos simples (`cargar`, `buscar`, `guardar`, `eliminar`) sin conocer HTTP, URLs, conversión de fechas ni códigos de error |
+| **Observer** | `Observable` de `HttpClient` en `services/videojuego-api.ts` y señales (`signal`) en la fachada | Los componentes reaccionan automáticamente cuando llegan los datos o cambia el estado |
+| **Singleton** | Servicios con `providedIn: 'root'` (`VideojuegoApi`, `Auth`, `CatalogoFacade`) | Una única instancia compartida del acceso a la API y de la sesión |
+
+### Flujo de una operación
+
+Ejemplo, al crear un videojuego:
+
+1. `Formulario` (vista) llama a `facade.guardar(null, form, ...)`.
+2. `CatalogoFacade` convierte la fecha de `yyyy-MM-dd` a `dd-MM-yyyy` y llama a `VideojuegoApi.crear()`.
+3. `authInterceptor` agrega `Authorization: Basic ...` y `X-Requested-With`.
+4. `ms-videojuegos` valida el rol `ADMIN` con `ms-usuarios`, guarda en Oracle y responde **201**.
+5. La fachada recibe la respuesta y la vista navega al detalle del videojuego creado.
+   Si hay un error, la fachada lo traduce a un mensaje y lo muestra en el formulario.
+
+### Seguridad en el frontend
+
+- `authInterceptor` envía las credenciales solo a las URLs de los microservicios.
+- `adminGuard` impide entrar a `/admin/*` si el usuario no es `ADMIN`.
+- Ocultar botones y proteger rutas mejora la experiencia, pero **la seguridad real está en el backend**: un `CLIENTE` recibe **403** aunque intente llamar a la API directamente.
 
 ## 🎮 ms-videojuegos (puerto 8080)
 
