@@ -1,6 +1,10 @@
 <section class="catalogo">
     <h1>Catálogo de videojuegos</h1>
 
+    @if (auth.esAdmin()) {
+        <a routerLink="/admin/nuevo" class="nuevo">+ Nuevo videojuego</a>
+    }
+
     <!-- Búsqueda -->
     <form class="filtros" (ngSubmit)="buscar()">
         <input type="text" name="titulo" placeholder="Título"
@@ -61,7 +65,13 @@
                 <td>{{ v.genero }}</td>
                 <td>{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</td>
                 <td>{{ v.stock }}</td>
-                <td><a [routerLink]="['/videojuego', v.id]">Ver</a></td>
+                <td class="acciones">
+                    <a [routerLink]="['/videojuego', v.id]">Ver</a>
+                    @if (auth.esAdmin()) {
+                        <a [routerLink]="['/admin/editar', v.id]">Editar</a>
+                        <button type="button" class="eliminar" (click)="eliminar(v)">Eliminar</button>
+                    }
+                </td>
             </tr>
             }
         </tbody>

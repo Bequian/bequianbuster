@@ -1,0 +1,93 @@
+<section class="formulario">
+  <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
+  <h1>{{ esEdicion ? 'Editar videojuego' : 'Nuevo videojuego' }}</h1>
+
+  @if (facade.cargando()) {
+    <p class="info">Cargando...</p>
+  } @else {
+    <form #f="ngForm" (ngSubmit)="guardar()" novalidate>
+
+      <label>
+        Título *
+        <input type="text" name="titulo" required maxlength="100"
+               [(ngModel)]="form.titulo">
+        @if (facade.erroresCampos()['titulo']; as e) { <small class="error">{{ e }}</small> }
+      </label>
+
+      <label>
+        Desarrollador *
+        <input type="text" name="desarrollador" required maxlength="100"
+               [(ngModel)]="form.desarrollador">
+        @if (facade.erroresCampos()['desarrollador']; as e) { <small class="error">{{ e }}</small> }
+      </label>
+
+      <div class="fila">
+        <label>
+          Fecha de lanzamiento *
+          <input type="date" name="fechaLanzamiento" required
+                 [(ngModel)]="form.fechaLanzamiento">
+          @if (facade.erroresCampos()['fechaLanzamiento']; as e) { <small class="error">{{ e }}</small> }
+        </label>
+
+        <label>
+          Plataforma *
+          <select name="plataforma" required [(ngModel)]="form.plataforma">
+            <option value="" disabled>Selecciona una plataforma</option>
+            @for (p of plataformas; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+          @if (facade.erroresCampos()['plataforma']; as e) { <small class="error">{{ e }}</small> }
+        </label>
+      </div>
+
+      <label>
+        Género *
+        <input type="text" name="genero" required maxlength="50"
+               [(ngModel)]="form.genero">
+        @if (facade.erroresCampos()['genero']; as e) { <small class="error">{{ e }}</small> }
+      </label>
+
+      <label>
+        Descripción *
+        <textarea name="descripcion" rows="4" required maxlength="500"
+                  [(ngModel)]="form.descripcion"></textarea>
+        @if (facade.erroresCampos()['descripcion']; as e) { <small class="error">{{ e }}</small> }
+      </label>
+
+      <div class="fila">
+        <label>
+          Precio (CLP) *
+          <input type="number" name="precio" required min="1" step="1"
+                 [(ngModel)]="form.precio">
+          @if (facade.erroresCampos()['precio']; as e) { <small class="error">{{ e }}</small> }
+        </label>
+
+        <label>
+          Stock *
+          <input type="number" name="stock" required min="0" step="1"
+                 [(ngModel)]="form.stock">
+          @if (facade.erroresCampos()['stock']; as e) { <small class="error">{{ e }}</small> }
+        </label>
+      </div>
+
+      <label>
+        Ruta de imagen
+        <input type="text" name="imagen" maxlength="255" placeholder="img/videojuegos/ejemplo.jpg"
+               [(ngModel)]="form.imagen">
+        @if (facade.erroresCampos()['imagen']; as e) { <small class="error">{{ e }}</small> }
+      </label>
+
+      @if (facade.error()) {
+        <p class="error mensaje">{{ facade.error() }}</p>
+      }
+
+      <div class="acciones">
+        <button type="submit" [disabled]="f.invalid || facade.guardando()">
+          {{ facade.guardando() ? 'Guardando...' : (esEdicion ? 'Guardar cambios' : 'Crear videojuego') }}
+        </button>
+        <a routerLink="/catalogo" class="cancelar">Cancelar</a>
+      </div>
+    </form>
+  }
+</section>

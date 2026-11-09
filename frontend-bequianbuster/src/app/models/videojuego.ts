@@ -25,3 +25,20 @@ export type VideojuegoRequest = Omit<Videojuego, 'id'>;
 export const PLATAFORMAS = [
   'PC', 'PS4', 'PS5', 'Xbox One', 'Xbox Series X|S', 'Nintendo Switch'
 ] as const;
+
+/**
+ * Datos del formulario de crear/editar.
+ * La fecha usa yyyy-MM-dd porque es el formato del <input type="date">.
+ * La fachada la convierte a dd-MM-yyyy antes de enviarla a la API.
+ */
+export interface FormularioVideojuego {
+  titulo: string;
+  desarrollador: string;
+  fechaLanzamiento: string;   // yyyy-MM-dd
+  plataforma: string;
+  genero: string;
+  descripcion: string;
+  precio: number | null;
+  stock: number | null;
+  imagen: string;
+}

@@ -6,6 +6,9 @@ import { Router, RouterLink } from '@angular/router';
 import { CatalogoFacade } from '../../facades/catalogo-facade';
 import { PLATAFORMAS } from '../../models/videojuego';
 
+import { Auth } from '../../services/auth';
+import { Videojuego } from '../../models/videojuego';
+
 @Component({
   selector: 'app-catalogo',
   imports: [FormsModule, CurrencyPipe, RouterLink],
@@ -18,10 +21,14 @@ export class Catalogo implements OnInit {
   private readonly router = inject(Router);
   protected readonly plataformas = PLATAFORMAS;
 
+  protected readonly auth = inject(Auth);
+
   protected filtroTitulo = '';
   protected filtroPlataforma = '';
   protected filtroGenero = '';
   protected idBuscado: number | null = null;
+
+  
 
   ngOnInit(): void {
     this.facade.cargar();
@@ -46,6 +53,13 @@ export class Catalogo implements OnInit {
   protected verPorId(): void {
     if (this.idBuscado && this.idBuscado > 0) {
       this.router.navigate(['/videojuego', this.idBuscado]);
+    }
+  }
+
+  /** Pide confirmación y elimina el videojuego (DELETE). */
+  protected eliminar(v: Videojuego): void {
+    if (confirm(`¿Eliminar "${v.titulo}"? Esta acción no se puede deshacer.`)) {
+      this.facade.eliminar(v.id);
     }
   }
 }
