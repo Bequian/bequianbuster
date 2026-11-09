@@ -38,7 +38,8 @@ public class SecurityConfig {
 
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        corsConfig.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        //Agregado X.Requested-With para permitir peticiones AJAX desde el frontend Angular
+        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         

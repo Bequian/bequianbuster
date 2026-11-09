@@ -1,0 +1,25 @@
+<section class="login">
+  <h1>Iniciar sesión</h1>
+
+  <form #form="ngForm" (ngSubmit)="ingresar()">
+    <label>
+      Usuario
+      <input type="text" name="usuario" required autocomplete="username"
+             [(ngModel)]="usuario">
+    </label>
+
+    <label>
+      Contraseña
+      <input type="password" name="password" required autocomplete="current-password"
+             [(ngModel)]="password">
+    </label>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <button type="submit" [disabled]="form.invalid || enviando()">
+      {{ enviando() ? 'Ingresando...' : 'Ingresar' }}
+    </button>
+  </form>
+</section>

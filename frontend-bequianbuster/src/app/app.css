@@ -1,0 +1,13 @@
+.barra {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.5rem; background: #1f2937; color: #fff;
+}
+.barra a { color: #fff; text-decoration: none; margin-left: 1rem; }
+.marca { font-weight: 700; margin-left: 0 !important; }
+
+.barra nav { display: flex; align-items: center; }
+.usuario { margin-left: 1rem; color: #d1d5db; }
+.salir {
+  margin-left: 1rem; padding: .35rem .7rem; cursor: pointer;
+  background: transparent; color: #fff; border: 1px solid #6b7280; border-radius: 4px;
+}
