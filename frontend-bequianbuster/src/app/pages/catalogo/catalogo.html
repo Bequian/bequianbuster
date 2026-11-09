@@ -1,61 +1,70 @@
 <section class="catalogo">
-  <h1>Catálogo de videojuegos</h1>
+    <h1>Catálogo de videojuegos</h1>
 
-  <!-- Búsqueda -->
-  <form class="filtros" (ngSubmit)="buscar()">
-    <input type="text" name="titulo" placeholder="Título"
-           [(ngModel)]="filtroTitulo">
+    <!-- Búsqueda -->
+    <form class="filtros" (ngSubmit)="buscar()">
+        <input type="text" name="titulo" placeholder="Título"
+            [(ngModel)]="filtroTitulo">
 
-    <select name="plataforma" [(ngModel)]="filtroPlataforma">
-      <option value="">Todas las plataformas</option>
-      @for (p of plataformas; track p) {
-        <option [value]="p">{{ p }}</option>
-      }
-    </select>
-
-    <input type="text" name="genero" placeholder="Género"
-           [(ngModel)]="filtroGenero">
-
-    <button type="submit">Buscar</button>
-    <button type="button" (click)="limpiar()">Limpiar</button>
-  </form>
-
-  <!-- Estados -->
-  @if (facade.cargando()) {
-    <p class="info">Cargando...</p>
-  } @else if (facade.error()) {
-    <p class="error">{{ facade.error() }}</p>
-  } @else if (facade.videojuegos().length === 0) {
-    <p class="info">No se encontraron videojuegos.</p>
-  } @else {
-    <!-- Tabla -->
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>Desarrollador</th>
-          <th>Lanzamiento</th>
-          <th>Plataforma</th>
-          <th>Género</th>
-          <th>Precio</th>
-          <th>Stock</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (v of facade.videojuegos(); track v.id) {
-          <tr>
-            <td>{{ v.id }}</td>
-            <td>{{ v.titulo }}</td>
-            <td>{{ v.desarrollador }}</td>
-            <td>{{ v.fechaLanzamiento }}</td>
-            <td>{{ v.plataforma }}</td>
-            <td>{{ v.genero }}</td>
-            <td>{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</td>
-            <td>{{ v.stock }}</td>
-          </tr>
+        <select name="plataforma" [(ngModel)]="filtroPlataforma">
+        <option value="">Todas las plataformas</option>
+        @for (p of plataformas; track p) {
+            <option [value]="p">{{ p }}</option>
         }
-      </tbody>
-    </table>
-  }
+        </select>
+
+        <input type="text" name="genero" placeholder="Género"
+            [(ngModel)]="filtroGenero">
+
+        <button type="submit">Buscar</button>
+        <button type="button" (click)="limpiar()">Limpiar</button>
+    </form>
+
+        <!-- Búsqueda por ID -->
+    <form class="filtros" (ngSubmit)="verPorId()">
+        <input type="number" name="idBuscado" placeholder="Buscar por ID" min="1"
+            [(ngModel)]="idBuscado">
+        <button type="submit">Ver detalle</button>
+    </form>
+
+    <!-- Estados -->
+    @if (facade.cargando()) {
+        <p class="info">Cargando...</p>
+    } @else if (facade.error()) {
+        <p class="error">{{ facade.error() }}</p>
+    } @else if (facade.videojuegos().length === 0) {
+        <p class="info">No se encontraron videojuegos.</p>
+    } @else {
+        <!-- Tabla -->
+        <table>
+        <thead>
+            <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Desarrollador</th>
+            <th>Lanzamiento</th>
+            <th>Plataforma</th>
+            <th>Género</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (v of facade.videojuegos(); track v.id) {
+            <tr>
+                <td>{{ v.id }}</td>
+                <td>{{ v.titulo }}</td>
+                <td>{{ v.desarrollador }}</td>
+                <td>{{ v.fechaLanzamiento }}</td>
+                <td>{{ v.plataforma }}</td>
+                <td>{{ v.genero }}</td>
+                <td>{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</td>
+                <td>{{ v.stock }}</td>
+                <td><a [routerLink]="['/videojuego', v.id]">Ver</a></td>
+            </tr>
+            }
+        </tbody>
+        </table>
+    }
 </section>

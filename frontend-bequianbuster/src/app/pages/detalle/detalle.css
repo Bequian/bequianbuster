@@ -1,0 +1,10 @@
+.detalle { max-width: 800px; margin: 0 auto; padding: 1.5rem; }
+.volver { display: inline-block; margin-bottom: 1rem; color: #2563eb; text-decoration: none; }
+
+.ficha { display: grid; grid-template-columns: 160px 1fr; gap: .5rem 1rem; }
+.ficha dt { font-weight: 600; color: #555; }
+.ficha dd { margin: 0; }
+
+.descripcion { margin-top: 1.5rem; line-height: 1.6; }
+.info { color: #555; }
+.error { color: #b00020; font-weight: 600; }

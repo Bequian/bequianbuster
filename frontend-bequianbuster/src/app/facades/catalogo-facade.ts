@@ -27,6 +27,9 @@ export class CatalogoFacade {
   readonly cargando = this._cargando.asReadonly();
   readonly error = this._error.asReadonly();
 
+  private readonly _seleccionado = signal<Videojuego | null>(null);
+  readonly seleccionado = this._seleccionado.asReadonly();
+
   /** Carga el catálogo completo (GET /videojuego). */
   cargar(): void {
     this.iniciarCarga();
@@ -45,6 +48,19 @@ export class CatalogoFacade {
     });
   }
 
+  /** Carga un videojuego por su ID (GET /videojuego/:id). */
+  cargarDetalle(id: number): void {
+    this._seleccionado.set(null);
+    this.iniciarCarga();
+    this.api.buscarPorId(id).subscribe({
+      next: videojuego => {
+        this._seleccionado.set(videojuego);
+        this._cargando.set(false);
+      },
+      error: err => this.manejarError(err)
+    });
+  }
+
   private iniciarCarga(): void {
     this._cargando.set(true);
     this._error.set(null);
@@ -58,10 +74,15 @@ export class CatalogoFacade {
   /** Traduce el error HTTP a un mensaje entendible para el usuario. */
   private manejarError(err: HttpErrorResponse): void {
     this._cargando.set(false);
-    this._error.set(
-      err.status === 0
-        ? 'No se pudo conectar con el servicio de videojuegos. Verifica que esté en ejecución.'
-        : err.error?.mensaje ?? `Error inesperado (${err.status}).`
-    );
+
+    let mensaje: string;
+    if (err.status === 0) {
+      mensaje = 'No se pudo conectar con el servicio de videojuegos. Verifica que esté en ejecución.';
+    } else if (err.status === 404) {
+      mensaje = err.error?.mensaje ?? 'El videojuego solicitado no existe.';
+    } else {
+      mensaje = err.error?.mensaje ?? `Error inesperado (${err.status}).`;
+    }
+    this._error.set(mensaje);
   }
 }

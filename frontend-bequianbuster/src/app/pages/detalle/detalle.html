@@ -1,0 +1,24 @@
+<section class="detalle">
+  <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
+
+  @if (facade.cargando()) {
+    <p class="info">Cargando...</p>
+  } @else if (facade.error()) {
+    <p class="error">{{ facade.error() }}</p>
+  } @else if (facade.seleccionado(); as v) {
+    <h1>{{ v.titulo }}</h1>
+
+    <dl class="ficha">
+      <dt>ID</dt>             <dd>{{ v.id }}</dd>
+      <dt>Desarrollador</dt>  <dd>{{ v.desarrollador }}</dd>
+      <dt>Lanzamiento</dt>    <dd>{{ v.fechaLanzamiento }}</dd>
+      <dt>Plataforma</dt>     <dd>{{ v.plataforma }}</dd>
+      <dt>Género</dt>         <dd>{{ v.genero }}</dd>
+      <dt>Precio</dt>         <dd>{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</dd>
+      <dt>Stock</dt>          <dd>{{ v.stock }}</dd>
+      <dt>Imagen</dt>         <dd>{{ v.imagen ?? 'Sin imagen' }}</dd>
+    </dl>
+
+    <p class="descripcion">{{ v.descripcion }}</p>
+  }
+</section>
