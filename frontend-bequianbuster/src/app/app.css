@@ -1,0 +1,6 @@
+.barra {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .8rem 1.5rem; background: #1f2937; color: #fff;
+}
+.barra a { color: #fff; text-decoration: none; margin-left: 1rem; }
+.marca { font-weight: 700; margin-left: 0 !important; }
