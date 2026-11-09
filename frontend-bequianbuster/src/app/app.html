@@ -2,6 +2,13 @@
   <a routerLink="/catalogo" class="marca">🎮 BequianBuster</a>
   <nav>
     <a routerLink="/catalogo">Catálogo</a>
+
+    @if (auth.sesion(); as s) {
+      <span class="usuario">{{ s.usuario }} ({{ s.rol }})</span>
+      <button type="button" class="salir" (click)="salir()">Cerrar sesión</button>
+    } @else {
+      <a routerLink="/login">Iniciar sesión</a>
+    }
   </nav>
 </header>
 
