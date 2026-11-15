@@ -369,6 +369,16 @@ cd ms-videojuegos
 
 También se pueden iniciar desde el **Spring Boot Dashboard** de VSCode.
 
+Con los dos microservicios en ejecución, levantar el frontend:
+
+```powershell
+cd frontend-bequianbuster
+npm install      # solo la primera vez
+ng serve
+```
+
+Abrir `http://localhost:4200`.
+
 ---
 
 ## 🧪 Pruebas en Postman
