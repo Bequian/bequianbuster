@@ -4,7 +4,7 @@
 
   <groupId>cl.bequianbuster</groupId>
   <artifactId>bb-microservicio-archetype</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>BequianBuster - Arquetipo de microservicio</name>
   <description>Plantilla base para microservicios BequianBuster: Spring Boot 4, Oracle Autonomous DB con wallet, capas estándar y respuestas de error con patrón Builder.</description>
   

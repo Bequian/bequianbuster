@@ -83,6 +83,26 @@ public class GlobalErrorHandler {
             .ruta(req.getRequestURI())
             .build());
     }
+    
+    /** 405: método HTTP no permitido en la ruta (ej: POST /recurso/1). */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> metodoNoPermitido(HttpRequestMethodNotSupportedException ex, HttpServletRequest req) {
+        return responder(ErrorResponse.builder()
+            .estado(HttpStatus.METHOD_NOT_ALLOWED)
+            .mensaje("El método " + ex.getMethod() + " no está permitido en esta ruta")
+            .ruta(req.getRequestURI())
+            .build());
+    }
+
+    /** 415: el cuerpo no se envió como JSON. */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> tipoNoSoportado(HttpMediaTypeNotSupportedException ex, HttpServletRequest req) {
+        return responder(ErrorResponse.builder()
+            .estado(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+            .mensaje("Tipo de contenido no soportado. Use Content-Type: application/json")
+            .ruta(req.getRequestURI())
+            .build());
+    }
 
     /** 500: cualquier error no previsto. El detalle va al log, no al cliente. */
     @ExceptionHandler(Exception.class)
