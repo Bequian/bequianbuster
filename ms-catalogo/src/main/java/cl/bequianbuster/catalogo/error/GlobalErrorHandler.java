@@ -8,11 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -57,6 +60,36 @@ public class GlobalErrorHandler {
         return responder(ErrorResponse.builder()
             .estado(HttpStatus.BAD_REQUEST)
             .mensaje("Valor inválido para el parámetro '" + ex.getName() + "'")
+            .ruta(req.getRequestURI())
+            .build());
+    }
+
+    /** 400: valor no permitido en la solicitud (ej: un orden inexistente). */
+    @ExceptionHandler(SolicitudInvalidaException.class)
+    public ResponseEntity<ErrorResponse> solicitudInvalida(SolicitudInvalidaException ex, HttpServletRequest req) {
+        return responder(ErrorResponse.builder()
+            .estado(HttpStatus.BAD_REQUEST)
+            .mensaje(ex.getMessage())
+            .ruta(req.getRequestURI())
+            .build());
+    }
+
+    /** 405: método HTTP no permitido en la ruta (ej: POST /recurso/1). */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> metodoNoPermitido(HttpRequestMethodNotSupportedException ex, HttpServletRequest req) {
+        return responder(ErrorResponse.builder()
+            .estado(HttpStatus.METHOD_NOT_ALLOWED)
+            .mensaje("El método " + ex.getMethod() + " no está permitido en esta ruta")
+            .ruta(req.getRequestURI())
+            .build());
+    }
+
+    /** 415: el cuerpo no se envió como JSON. */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> tipoNoSoportado(HttpMediaTypeNotSupportedException ex, HttpServletRequest req) {
+        return responder(ErrorResponse.builder()
+            .estado(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+            .mensaje("Tipo de contenido no soportado. Use Content-Type: application/json")
             .ruta(req.getRequestURI())
             .build());
     }
