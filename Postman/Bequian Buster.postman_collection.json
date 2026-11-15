@@ -14,19 +14,7 @@
           "name": "Catalogo Videojuegos",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
-                {
-                  "key": "username",
-                  "value": "{{cliente1User}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{cliente1Pass}}",
-                  "type": "string"
-                }
-              ]
+              "type": "noauth"
             },
             "method": "GET",
             "header": [],
@@ -45,6 +33,9 @@
         {
           "name": "Mostrar Videojuego por ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -55,6 +46,54 @@
               "path": [
                 "videojuego",
                 "10"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Busqueda por titulo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{videojuegos}}/videojuego/buscar?titulo=witcher",
+              "host": [
+                "{{videojuegos}}"
+              ],
+              "path": [
+                "videojuego",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "titulo",
+                  "value": "witcher"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Busqueda por Plataforma",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{videojuegos}}/videojuego/buscar?plataforma=PC",
+              "host": [
+                "{{videojuegos}}"
+              ],
+              "path": [
+                "videojuego",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "plataforma",
+                  "value": "PC"
+                }
               ]
             }
           },
@@ -532,7 +571,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"invitado_s2\",\r\n    \"email\": \"invitado_s2duocplay.test\",\r\n    \"password\": \"{{nuevoPassword}}\",\r\n    \"rol\": \"CLIENTE\"\r\n}\r\n\r\n",
+              "raw": "{\r\n    \"username\": \"invitado_s2\",\r\n    \"email\": \"invitado_s2@duocplay.test\",\r\n    \"password\": \"{{nuevoPassword}}\",\r\n    \"rol\": \"CLIENTE\"\r\n}\r\n\r\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -728,6 +767,231 @@
               "path": [
                 "usuarios",
                 "{{idUsuario}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ms-catalogo (Semana 4)",
+      "item": [
+        {
+          "name": "Catalogo Videojuegos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogo}}/videojuego",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ordenado Precio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogo}}/videojuego?orden=precio",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego"
+              ],
+              "query": [
+                {
+                  "key": "orden",
+                  "value": "precio"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ordenado Fecha",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogo}}/videojuego?orden=fecha",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego"
+              ],
+              "query": [
+                {
+                  "key": "orden",
+                  "value": "fecha"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ordenado error valor permitido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogo}}/videojuego?orden=color",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego"
+              ],
+              "query": [
+                {
+                  "key": "orden",
+                  "value": "color"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogo}}/videojuego/1",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogo}}/videojuego/999",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Videojuego",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"titulo\": \"Hades\",\r\n  \"desarrollador\": \"Supergiant Games\",\r\n  \"fechaLanzamiento\": \"17-09-2020\",\r\n  \"plataforma\": \"PC\",\r\n  \"genero\": \"Roguelike\",\r\n  \"descripcion\": \"Zagreus intenta escapar del inframundo.\",\r\n  \"precio\": 14990,\r\n  \"stock\": 30,\r\n  \"imagen\": \"img/videojuegos/hades.jpg\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{catalogo}}/videojuego",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar Stock Videojuego creado",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"titulo\": \"Hades\",\r\n  \"desarrollador\": \"Supergiant Games\",\r\n  \"fechaLanzamiento\": \"17-09-2020\",\r\n  \"plataforma\": \"PC\",\r\n  \"genero\": \"Roguelike\",\r\n  \"descripcion\": \"Zagreus intenta escapar del inframundo.\",\r\n  \"precio\": 14990,\r\n  \"stock\": 40,\r\n  \"imagen\": \"img/videojuegos/hades.jpg\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{catalogo}}/videojuego/{{idVideojuego}}",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego",
+                "{{idVideojuego}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar plataforma inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"titulo\": \"Hades\",\r\n  \"desarrollador\": \"Supergiant Games\",\r\n  \"fechaLanzamiento\": \"17-09-2020\",\r\n  \"plataforma\": \"PS3\",\r\n  \"genero\": \"Roguelike\",\r\n  \"descripcion\": \"Zagreus intenta escapar del inframundo.\",\r\n  \"precio\": 14990,\r\n  \"stock\": 30,\r\n  \"imagen\": \"img/videojuegos/hades.jpg\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{catalogo}}/videojuego/{{idVideojuego}}",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego",
+                "{{idVideojuego}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Videojuego Creado",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{catalogo}}/videojuego/{{idVideojuego}}",
+              "host": [
+                "{{catalogo}}"
+              ],
+              "path": [
+                "videojuego",
+                "{{idVideojuego}}"
               ]
             }
           },
