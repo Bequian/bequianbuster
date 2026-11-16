@@ -8,6 +8,14 @@ Aplicación Full Stack para gestionar el catálogo de videojuegos de una tienda 
 
 ## 📌 Historial de versiones
 
+### v4.0 – Semana 4: Arquetipo Maven y reconstrucción del microservicio
+- Arquetipo Maven propio **`bb-microservicio-archetype`** (versiones 1.0.0 y 1.1.0), creado a partir del proyecto base `bb-base`.
+- El arquetipo incluye la infraestructura estándar: conexión a Oracle con wallet, capas, manejo global de errores y el **patrón Builder** en `ErrorResponse`.
+- Propiedades propias del arquetipo: `nombreClase` (clase principal) y `puerto`.
+- Nuevo microservicio **`ms-catalogo`** generado desde el arquetipo, con el CRUD de videojuegos reconstruido sobre Oracle.
+- **Patrón Strategy** para ordenar el catálogo (`?orden=titulo|precio|fecha`).
+- Desarrollo en la rama `feature/arquetipo-maven`.
+
 ### v3.0 – Semana 3: Frontend Angular con patrones de diseño
 - Nuevo proyecto **`frontend-bequianbuster`** en Angular 22, conectado a los microservicios.
 - CRUD completo desde la interfaz: listar, buscar, ver detalle, crear, editar y eliminar videojuegos.
@@ -102,6 +110,10 @@ Cada microservicio es dueño de su propia tabla. `ms-videojuegos` **no consulta*
 
 ```
 bequianbuster/
+├── arquetipos/
+│   ├── bb-base/                       # Proyecto origen del arquetipo
+│   └── bb-microservicio-archetype/    # Arquetipo Maven (plantillas)
+├── ms-catalogo/                       # Generado desde el arquetipo – puerto 8082
 ├── Postman/
 │   ├── Bequian Buster.postman_collection.json
 │   └── Entorno BB.postman_environment.json   # Plantilla sin contraseñas
@@ -196,6 +208,120 @@ Ejemplo, al crear un videojuego:
 - `authInterceptor` envía las credenciales solo a las URLs de los microservicios.
 - `adminGuard` impide entrar a `/admin/*` si el usuario no es `ADMIN`.
 - Ocultar botones y proteger rutas mejora la experiencia, pero **la seguridad real está en el backend**: un `CLIENTE` recibe **403** aunque intente llamar a la API directamente.
+
+## 🧬 Arquetipo Maven `bb-microservicio-archetype`
+
+Plantilla para crear nuevos microservicios BequianBuster con la misma estructura y los mismos lineamientos, sin configurarlos a mano cada vez.
+
+### Ciclo de creación
+
+```
+bb-base (Spring Initializr + infraestructura)
+   │  archetype:create-from-project
+   ▼
+bb-microservicio-archetype (plantillas)
+   │  clean install
+   ▼
+Repositorio local ~/.m2
+   │  archetype:generate
+   ▼
+ms-catalogo (nuevo microservicio) → se agrega la lógica de negocio
+```
+
+### Qué incluye la plantilla
+
+| Elemento | Lineamiento |
+|---|---|
+| `pom.xml` | Spring Boot 4.1.2, Java 21, Web, JPA, Validation, `ojdbc17` y `oraclepki` |
+| `application.properties` | Oracle con wallet; credenciales y alias desde variables de entorno (`DB_USER`, `DB_PASSWORD`, `TNS_ADMIN`, `DB_SERVICE`); `ddl-auto=validate` |
+| Capas | `controller`, `service`, `repository`, `model`, `dto`, `error` (documentadas con `package-info.java`) |
+| `error/ErrorResponse` | **Patrón Builder**: respuestas de error con formato único |
+| `error/GlobalErrorHandler` | Errores 400, 404, 405, 415 y 500 construidos con el Builder |
+| `controller/EstadoController` | `GET /estado` para verificar que el servicio está activo |
+
+### Patrón Builder en el arquetipo
+
+`ErrorResponse` se construye paso a paso con métodos encadenados, en vez de un constructor con cinco parámetros:
+
+```java
+ErrorResponse.builder()
+    .estado(HttpStatus.NOT_FOUND)
+    .mensaje("Videojuego no encontrado con id: 99")
+    .ruta("/videojuego/99")
+    .build();
+```
+
+El builder completa valores por defecto (`momento`, `datos`) y valida que no falten `estado` ni `mensaje`. Como está en la plantilla, **todo microservicio generado responde los errores con el mismo formato JSON**.
+
+### Propiedades del arquetipo
+
+| Propiedad | Uso | Valor por defecto |
+|---|---|---|
+| `nombreClase` | Nombre de la clase principal: `Catalogo` → `CatalogoApplication` | `Microservicio` |
+| `puerto` | `server.port` del proyecto generado | `8090` |
+
+### Versiones
+
+| Versión | Cambios |
+|---|---|
+| 1.0.0 | Primera versión: infraestructura Oracle, capas, Builder y `/estado` |
+| 1.1.0 | Manejo de errores 405 (método no permitido) y 415 (tipo de contenido no soportado), que antes respondían 500 |
+
+### Instalar y usar
+
+```powershell
+# Instalar en el repositorio local de Maven
+cd arquetipos\bb-microservicio-archetype
+..\bb-base\mvnw.cmd clean install
+
+# Generar un microservicio nuevo (desde la raíz del repositorio)
+.\arquetipos\bb-base\mvnw.cmd org.apache.maven.plugins:maven-archetype-plugin:3.4.1:generate -B `
+  "-DarchetypeGroupId=cl.bequianbuster" `
+  "-DarchetypeArtifactId=bb-microservicio-archetype" `
+  "-DarchetypeVersion=1.1.0" `
+  "-DgroupId=cl.bequianbuster" `
+  "-DartifactId=ms-nuevo" `
+  "-Dpackage=cl.bequianbuster.nuevo" `
+  "-DnombreClase=Nuevo" `
+  "-Dpuerto=8083" `
+  "-DarchetypeCatalog=local"
+```
+
+> Si `create-from-project` falla con *"The specified user settings file does not exist"*, crear un archivo vacío `<settings></settings>` en `%USERPROFILE%\.m2\settings.xml`.
+
+## 📦 ms-catalogo (puerto 8082)
+
+Reconstrucción del microservicio de la Semana 1, **generado con `bb-microservicio-archetype` 1.0.0** (ver el commit *"Generar microservicio ms-catalogo desde arquetipo"*). Usa la misma tabla `BB_VIDEOJUEGO` y no tiene seguridad, igual que el microservicio original.
+
+### Endpoints
+
+| Método | Ruta | Respuestas |
+|---|---|---|
+| GET | `/videojuego` | 200 |
+| GET | `/videojuego?orden=titulo\|precio\|fecha` | 200 / 400 si el orden no existe |
+| GET | `/videojuego/{id}` | 200 / 404 |
+| POST | `/videojuego` | 201 / 400 |
+| PUT | `/videojuego/{id}` | 200 / 400 / 404 |
+| DELETE | `/videojuego/{id}` | 204 / 404 |
+| GET | `/estado` | 200 (heredado del arquetipo) |
+
+### Patrón Strategy: orden del catálogo
+
+| Clase | Rol |
+|---|---|
+| `orden/EstrategiaOrden` | Interfaz común: `clave()` y `comparador()` |
+| `OrdenPorTitulo`, `OrdenPorPrecio`, `OrdenPorFecha` | Estrategias concretas (`@Component`) |
+| `orden/SelectorOrden` | Recibe todas las estrategias por inyección y elige según `?orden=` |
+
+**Problema que resuelve:** evita un `if/else` o `switch` en el servicio que crecería con cada criterio nuevo. Para agregar un orden basta con crear una clase que implemente `EstrategiaOrden`; el servicio y el controlador no cambian.
+
+### Patrones en el microservicio
+
+| Patrón | Origen | Dónde |
+|---|---|---|
+| Builder | Heredado del arquetipo | `error/ErrorResponse`, usado en `GlobalErrorHandler` |
+| Strategy | Propio de ms-catalogo | Paquete `orden` |
+| Singleton | Spring | Beans `@Service`, `@Component` y `@RestController` (una instancia por contexto) |
 
 ## 🎮 ms-videojuegos (puerto 8080)
 
@@ -368,6 +494,23 @@ cd ms-videojuegos
 ```
 
 También se pueden iniciar desde el **Spring Boot Dashboard** de VSCode.
+
+Con los dos microservicios en ejecución, levantar el frontend:
+
+```powershell
+cd frontend-bequianbuster
+npm install      # solo la primera vez
+ng serve
+```
+
+Abrir `http://localhost:4200`.
+
+Microservicio generado desde el arquetipo (independiente, sin autenticación):
+
+```powershell
+cd ms-catalogo
+.\mvnw.cmd spring-boot:run
+```
 
 ---
 

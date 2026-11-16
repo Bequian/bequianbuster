@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>cl.bequianbuster</groupId>
+  <artifactId>bb-microservicio-archetype</artifactId>
+  <version>1.1.0</version>
+  <name>BequianBuster - Arquetipo de microservicio</name>
+  <description>Plantilla base para microservicios BequianBuster: Spring Boot 4, Oracle Autonomous DB con wallet, capas estándar y respuestas de error con patrón Builder.</description>
+  
+  <packaging>maven-archetype</packaging>
+
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+        <version>3.4.1</version>
+      </extension>
+    </extensions>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <configuration>
+          <!-- Permite empaquetar el .gitignore de la plantilla -->
+          <addDefaultExcludes>false</addDefaultExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+    
+  </build>
+
+  <developers>
+    <developer />
+  </developers>
+
+  <licenses>
+    <license />
+  </licenses>
+
+  <scm />
+</project>
