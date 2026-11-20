@@ -62,4 +62,15 @@ export class Catalogo implements OnInit {
       this.facade.eliminar(v.id);
     }
   }
+
+  /**
+  * Si la carátula no existe o falla al cargar, muestra el logo como respaldo.
+  * onerror se anula para evitar un ciclo si el logo también fallara.
+  */
+  protected sinImagen(evento: Event): void {
+    const img = evento.target as HTMLImageElement;
+    img.onerror = null;
+    img.src = 'logo.svg';
+    img.classList.add('sin-imagen');
+  }
 }

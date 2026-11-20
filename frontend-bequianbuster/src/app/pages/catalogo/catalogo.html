@@ -1,80 +1,124 @@
-<section class="catalogo">
-    <h1>Catálogo de videojuegos</h1>
+<section class="container">
 
+  <!-- Encabezado -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <h1 class="mb-1">Catálogo</h1>
+      <p class="text-suave mb-0">Encuentra tu próximo juego favorito</p>
+    </div>
     @if (auth.esAdmin()) {
-        <a routerLink="/admin/nuevo" class="nuevo">+ Nuevo videojuego</a>
+      <a routerLink="/admin/nuevo" class="btn btn-bb-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nuevo videojuego
+      </a>
     }
+  </div>
 
-    <!-- Búsqueda -->
-    <form class="filtros" (ngSubmit)="buscar()">
-        <input type="text" name="titulo" placeholder="Título"
-            [(ngModel)]="filtroTitulo">
-
-        <select name="plataforma" [(ngModel)]="filtroPlataforma">
-        <option value="">Todas las plataformas</option>
-        @for (p of plataformas; track p) {
+  <!-- Filtros -->
+  <div class="bb-panel p-3 mb-4">
+    <form class="row g-2 align-items-end" (ngSubmit)="buscar()">
+      <div class="col-12 col-md-6 col-lg-4">
+        <label class="form-label small" for="fTitulo">Título</label>
+        <input id="fTitulo" type="text" class="form-control" name="titulo"
+               placeholder="Ej: Zelda" [(ngModel)]="filtroTitulo">
+      </div>
+      <div class="col-12 col-sm-6 col-md-3 col-lg-3">
+        <label class="form-label small" for="fPlataforma">Plataforma</label>
+        <select id="fPlataforma" class="form-select" name="plataforma" [(ngModel)]="filtroPlataforma">
+          <option value="">Todas</option>
+          @for (p of plataformas; track p) {
             <option [value]="p">{{ p }}</option>
-        }
+          }
         </select>
-
-        <input type="text" name="genero" placeholder="Género"
-            [(ngModel)]="filtroGenero">
-
-        <button type="submit">Buscar</button>
-        <button type="button" (click)="limpiar()">Limpiar</button>
+      </div>
+      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+        <label class="form-label small" for="fGenero">Género</label>
+        <input id="fGenero" type="text" class="form-control" name="genero"
+               placeholder="Ej: RPG" [(ngModel)]="filtroGenero">
+      </div>
+      <div class="col-12 col-lg-3 d-flex gap-2">
+        <button type="submit" class="btn btn-bb-primary flex-fill">
+          <i class="bi bi-search me-1"></i>Buscar
+        </button>
+        <button type="button" class="btn btn-outline-light flex-fill" (click)="limpiar()">
+          Limpiar
+        </button>
+      </div>
     </form>
 
-        <!-- Búsqueda por ID -->
-    <form class="filtros" (ngSubmit)="verPorId()">
-        <input type="number" name="idBuscado" placeholder="Buscar por ID" min="1"
-            [(ngModel)]="idBuscado">
-        <button type="submit">Ver detalle</button>
+    <form class="row g-2 mt-1" (ngSubmit)="verPorId()">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-hash"></i></span>
+          <input type="number" class="form-control" name="idBuscado" min="1"
+                 placeholder="Ir a un videojuego por ID" [(ngModel)]="idBuscado">
+          <button type="submit" class="btn btn-outline-info">Ver</button>
+        </div>
+      </div>
     </form>
+  </div>
 
-    <!-- Estados -->
-    @if (facade.cargando()) {
-        <p class="info">Cargando...</p>
-    } @else if (facade.error()) {
-        <p class="error">{{ facade.error() }}</p>
-    } @else if (facade.videojuegos().length === 0) {
-        <p class="info">No se encontraron videojuegos.</p>
-    } @else {
-        <!-- Tabla -->
-        <table>
-        <thead>
-            <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Desarrollador</th>
-            <th>Lanzamiento</th>
-            <th>Plataforma</th>
-            <th>Género</th>
-            <th>Precio</th>
-            <th>Stock</th>
-            <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (v of facade.videojuegos(); track v.id) {
-            <tr>
-                <td>{{ v.id }}</td>
-                <td>{{ v.titulo }}</td>
-                <td>{{ v.desarrollador }}</td>
-                <td>{{ v.fechaLanzamiento }}</td>
-                <td>{{ v.plataforma }}</td>
-                <td>{{ v.genero }}</td>
-                <td>{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</td>
-                <td>{{ v.stock }}</td>
-                <td class="acciones">
-                    <a [routerLink]="['/videojuego', v.id]">Ver</a>
-                    @if (auth.esAdmin()) {
-                        <a [routerLink]="['/admin/editar', v.id]">Editar</a>
-                        <button type="button" class="eliminar" (click)="eliminar(v)">Eliminar</button>
-                    }
-                </td>
-            </tr>
-            }
-        </tbody>
-        </table>
-    }
+  <!-- Estados -->
+  @if (facade.cargando()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-info" role="status"></div>
+      <p class="text-suave mt-2">Cargando catálogo...</p>
+    </div>
+  } @else if (facade.error()) {
+    <div class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ facade.error() }}
+    </div>
+  } @else if (facade.videojuegos().length === 0) {
+    <div class="text-center py-5 text-suave">
+      <i class="bi bi-search fs-1 d-block mb-2"></i>
+      No se encontraron videojuegos con esos filtros.
+    </div>
+  } @else {
+
+    <!-- Grilla de tarjetas: 1 / 2 / 3 / 4 columnas -->
+    <div class="row g-4">
+      @for (v of facade.videojuegos(); track v.id) {
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <article class="card bb-card h-100">
+
+            <a [routerLink]="['/videojuego', v.id]" class="bb-portada">
+              <img [src]="v.imagen || 'logo.svg'" [alt]="'Carátula de ' + v.titulo"
+                   loading="lazy" (error)="sinImagen($event)">
+              <span class="badge bb-plataforma">{{ v.plataforma }}</span>
+            </a>
+
+            <div class="card-body d-flex flex-column">
+              <h2 class="h5 card-title mb-1">{{ v.titulo }}</h2>
+              <p class="small text-suave mb-3">{{ v.genero }} · {{ v.desarrollador }}</p>
+
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                <span class="bb-precio">{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+                @if (v.stock > 0) {
+                  <span class="badge text-bg-success">Stock: {{ v.stock }}</span>
+                } @else {
+                  <span class="badge text-bg-secondary">Agotado</span>
+                }
+              </div>
+            </div>
+
+            <div class="card-footer d-flex gap-2">
+              <a class="btn btn-sm btn-outline-light flex-fill" [routerLink]="['/videojuego', v.id]">
+                Ver detalle
+              </a>
+              @if (auth.esAdmin()) {
+                <a class="btn btn-sm btn-outline-info" [routerLink]="['/admin/editar', v.id]"
+                   title="Editar" aria-label="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="eliminar(v)"
+                        title="Eliminar" aria-label="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              }
+            </div>
+
+          </article>
+        </div>
+      }
+    </div>
+  }
 </section>
