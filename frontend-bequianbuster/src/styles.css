@@ -17,9 +17,6 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background: var(--bb-fondo);
   color: var(--bb-texto);
   font-family: "Inter", system-ui, sans-serif;

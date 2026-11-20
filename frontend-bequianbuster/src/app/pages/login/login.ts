@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -20,8 +20,14 @@ export class Login {
   protected password = '';
   protected readonly enviando = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly verPassword = signal(false);
 
-  protected ingresar(): void {
+  protected ingresar(f: NgForm): void {
+    if (f.invalid) {
+      f.control.markAllAsTouched();
+      return;
+    }
+
     this.enviando.set(true);
     this.error.set(null);
 

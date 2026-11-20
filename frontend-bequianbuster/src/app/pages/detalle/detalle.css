@@ -1,10 +1,27 @@
-.detalle { max-width: 800px; margin: 0 auto; padding: 1.5rem; }
-.volver { display: inline-block; margin-bottom: 1rem; color: #2563eb; text-decoration: none; }
+.bb-portada-detalle {
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bb-fondo-2);
+  border: 1px solid var(--bb-borde);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+}
+.bb-portada-detalle img { width: 100%; height: 100%; object-fit: cover; }
+.bb-portada-detalle img.sin-imagen { object-fit: contain; padding: 25%; }
 
-.ficha { display: grid; grid-template-columns: 160px 1fr; gap: .5rem 1rem; }
-.ficha dt { font-weight: 600; color: #555; }
-.ficha dd { margin: 0; }
+.bb-precio-grande {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--bb-acento);
+}
 
-.descripcion { margin-top: 1.5rem; line-height: 1.6; }
-.info { color: #555; }
-.error { color: #b00020; font-weight: 600; }
+.bb-dato {
+  background: var(--bb-superficie);
+  border: 1px solid var(--bb-borde);
+  border-radius: 10px;
+  padding: .6rem .8rem;
+  height: 100%;
+}
+.bb-dato small { display: block; color: var(--bb-texto-suave); font-size: .75rem; }
+.bb-dato strong { font-weight: 600; }

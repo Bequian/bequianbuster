@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CatalogoFacade } from '../../facades/catalogo-facade';
 import { FormularioVideojuego, PLATAFORMAS } from '../../models/videojuego';
+
 
 /**
  * Formulario para crear (POST) y editar (PUT) videojuegos.
@@ -39,7 +40,12 @@ export class Formulario implements OnInit {
     return this.id !== null;
   }
 
-  protected guardar(): void {
+  protected guardar(f: NgForm): void {
+    // Si hay errores, se marcan todos los campos para mostrar sus mensajes
+    if (f.invalid) {
+      f.control.markAllAsTouched();
+      return;
+    }
     this.facade.guardar(this.id, this.form, videojuego =>
       this.router.navigate(['/videojuego', videojuego.id])
     );

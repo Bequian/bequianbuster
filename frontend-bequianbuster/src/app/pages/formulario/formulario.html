@@ -1,93 +1,168 @@
-<section class="formulario">
-  <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
-  <h1>{{ esEdicion ? 'Editar videojuego' : 'Nuevo videojuego' }}</h1>
+<section class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8">
 
-  @if (facade.cargando()) {
-    <p class="info">Cargando...</p>
-  } @else {
-    <form #f="ngForm" (ngSubmit)="guardar()" novalidate>
+      <a routerLink="/catalogo" class="d-inline-block mb-3 text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i>Volver al catálogo
+      </a>
+      <h1 class="mb-4">{{ esEdicion ? 'Editar videojuego' : 'Nuevo videojuego' }}</h1>
 
-      <label>
-        Título *
-        <input type="text" name="titulo" required maxlength="100"
-               [(ngModel)]="form.titulo">
-        @if (facade.erroresCampos()['titulo']; as e) { <small class="error">{{ e }}</small> }
-      </label>
+      @if (facade.cargando()) {
+        <div class="text-center py-5"><div class="spinner-border text-info"></div></div>
+      } @else {
+        <form #f="ngForm" (ngSubmit)="guardar(f)" novalidate class="bb-panel p-3 p-md-4">
+          <div class="row g-3">
 
-      <label>
-        Desarrollador *
-        <input type="text" name="desarrollador" required maxlength="100"
-               [(ngModel)]="form.desarrollador">
-        @if (facade.erroresCampos()['desarrollador']; as e) { <small class="error">{{ e }}</small> }
-      </label>
+            <!-- Título -->
+            <div class="col-12">
+              <label class="form-label" for="titulo">Título *</label>
+              <input id="titulo" type="text" class="form-control" name="titulo"
+                     required minlength="2" maxlength="100"
+                     #titulo="ngModel" [(ngModel)]="form.titulo"
+                     [class.is-invalid]="(titulo.invalid && titulo.touched) || facade.erroresCampos()['titulo']">
+              <div class="invalid-feedback">
+                @if (titulo.errors?.['required']) { El título es obligatorio. }
+                @else if (titulo.errors?.['minlength']) { Debe tener al menos 2 caracteres. }
+                @else { {{ facade.erroresCampos()['titulo'] }} }
+              </div>
+            </div>
 
-      <div class="fila">
-        <label>
-          Fecha de lanzamiento *
-          <input type="date" name="fechaLanzamiento" required
-                 [(ngModel)]="form.fechaLanzamiento">
-          @if (facade.erroresCampos()['fechaLanzamiento']; as e) { <small class="error">{{ e }}</small> }
-        </label>
+            <!-- Desarrollador -->
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="desarrollador">Desarrollador *</label>
+              <input id="desarrollador" type="text" class="form-control" name="desarrollador"
+                     required maxlength="100"
+                     #desarrollador="ngModel" [(ngModel)]="form.desarrollador"
+                     [class.is-invalid]="(desarrollador.invalid && desarrollador.touched) || facade.erroresCampos()['desarrollador']">
+              <div class="invalid-feedback">
+                @if (desarrollador.errors?.['required']) { El desarrollador es obligatorio. }
+                @else { {{ facade.erroresCampos()['desarrollador'] }} }
+              </div>
+            </div>
 
-        <label>
-          Plataforma *
-          <select name="plataforma" required [(ngModel)]="form.plataforma">
-            <option value="" disabled>Selecciona una plataforma</option>
-            @for (p of plataformas; track p) {
-              <option [value]="p">{{ p }}</option>
-            }
-          </select>
-          @if (facade.erroresCampos()['plataforma']; as e) { <small class="error">{{ e }}</small> }
-        </label>
-      </div>
+            <!-- Género -->
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="genero">Género *</label>
+              <input id="genero" type="text" class="form-control" name="genero"
+                     required maxlength="50" placeholder="Ej: RPG, Aventura"
+                     #genero="ngModel" [(ngModel)]="form.genero"
+                     [class.is-invalid]="(genero.invalid && genero.touched) || facade.erroresCampos()['genero']">
+              <div class="invalid-feedback">
+                @if (genero.errors?.['required']) { El género es obligatorio. }
+                @else { {{ facade.erroresCampos()['genero'] }} }
+              </div>
+            </div>
 
-      <label>
-        Género *
-        <input type="text" name="genero" required maxlength="50"
-               [(ngModel)]="form.genero">
-        @if (facade.erroresCampos()['genero']; as e) { <small class="error">{{ e }}</small> }
-      </label>
+            <!-- Fecha -->
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="fecha">Fecha de lanzamiento *</label>
+              <input id="fecha" type="date" class="form-control" name="fechaLanzamiento" required
+                     #fecha="ngModel" [(ngModel)]="form.fechaLanzamiento"
+                     [class.is-invalid]="(fecha.invalid && fecha.touched) || facade.erroresCampos()['fechaLanzamiento']">
+              <div class="invalid-feedback">
+                @if (fecha.errors?.['required']) { La fecha es obligatoria. }
+                @else { {{ facade.erroresCampos()['fechaLanzamiento'] }} }
+              </div>
+            </div>
 
-      <label>
-        Descripción *
-        <textarea name="descripcion" rows="4" required maxlength="500"
-                  [(ngModel)]="form.descripcion"></textarea>
-        @if (facade.erroresCampos()['descripcion']; as e) { <small class="error">{{ e }}</small> }
-      </label>
+            <!-- Plataforma -->
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="plataforma">Plataforma *</label>
+              <select id="plataforma" class="form-select" name="plataforma" required
+                      #plataforma="ngModel" [(ngModel)]="form.plataforma"
+                      [class.is-invalid]="(plataforma.invalid && plataforma.touched) || facade.erroresCampos()['plataforma']">
+                <option value="" disabled>Selecciona una plataforma</option>
+                @for (p of plataformas; track p) {
+                  <option [value]="p">{{ p }}</option>
+                }
+              </select>
+              <div class="invalid-feedback">
+                @if (plataforma.errors?.['required']) { Selecciona una plataforma. }
+                @else { {{ facade.erroresCampos()['plataforma'] }} }
+              </div>
+            </div>
 
-      <div class="fila">
-        <label>
-          Precio (CLP) *
-          <input type="number" name="precio" required min="1" step="1"
-                 [(ngModel)]="form.precio">
-          @if (facade.erroresCampos()['precio']; as e) { <small class="error">{{ e }}</small> }
-        </label>
+            <!-- Precio -->
+            <div class="col-12 col-sm-6">
+              <label class="form-label" for="precio">Precio (CLP) *</label>
+              <div class="input-group has-validation">
+                <span class="input-group-text">$</span>
+                <input id="precio" type="number" class="form-control" name="precio"
+                       required min="1" max="9999999" step="1"
+                       #precio="ngModel" [(ngModel)]="form.precio"
+                       [class.is-invalid]="(precio.invalid && precio.touched) || facade.erroresCampos()['precio']">
+                <div class="invalid-feedback">
+                  @if (precio.errors?.['required']) { El precio es obligatorio. }
+                  @else if (precio.errors?.['min']) { El precio debe ser mayor a 0. }
+                  @else if (precio.errors?.['max']) { El precio es demasiado alto. }
+                  @else { {{ facade.erroresCampos()['precio'] }} }
+                </div>
+              </div>
+            </div>
 
-        <label>
-          Stock *
-          <input type="number" name="stock" required min="0" step="1"
-                 [(ngModel)]="form.stock">
-          @if (facade.erroresCampos()['stock']; as e) { <small class="error">{{ e }}</small> }
-        </label>
-      </div>
+            <!-- Stock -->
+            <div class="col-12 col-sm-6">
+              <label class="form-label" for="stock">Stock *</label>
+              <input id="stock" type="number" class="form-control" name="stock"
+                     required min="0" max="99999" step="1"
+                     #stock="ngModel" [(ngModel)]="form.stock"
+                     [class.is-invalid]="(stock.invalid && stock.touched) || facade.erroresCampos()['stock']">
+              <div class="invalid-feedback">
+                @if (stock.errors?.['required']) { El stock es obligatorio. }
+                @else if (stock.errors?.['min']) { El stock no puede ser negativo. }
+                @else { {{ facade.erroresCampos()['stock'] }} }
+              </div>
+            </div>
 
-      <label>
-        Ruta de imagen
-        <input type="text" name="imagen" maxlength="255" placeholder="img/videojuegos/ejemplo.jpg"
-               [(ngModel)]="form.imagen">
-        @if (facade.erroresCampos()['imagen']; as e) { <small class="error">{{ e }}</small> }
-      </label>
+            <!-- Descripción -->
+            <div class="col-12">
+              <label class="form-label" for="descripcion">Descripción *</label>
+              <textarea id="descripcion" class="form-control" name="descripcion" rows="4"
+                        required minlength="10" maxlength="500"
+                        #descripcion="ngModel" [(ngModel)]="form.descripcion"
+                        [class.is-invalid]="(descripcion.invalid && descripcion.touched) || facade.erroresCampos()['descripcion']"></textarea>
+              <div class="d-flex justify-content-between">
+                <div class="invalid-feedback d-block">
+                  @if (descripcion.touched && descripcion.errors?.['required']) { La descripción es obligatoria. }
+                  @else if (descripcion.touched && descripcion.errors?.['minlength']) { Debe tener al menos 10 caracteres. }
+                  @else if (facade.erroresCampos()['descripcion']) { {{ facade.erroresCampos()['descripcion'] }} }
+                </div>
+                <small class="text-suave ms-auto">{{ form.descripcion.length }}/500</small>
+              </div>
+            </div>
 
-      @if (facade.error()) {
-        <p class="error mensaje">{{ facade.error() }}</p>
+            <!-- Imagen con vista previa -->
+            <div class="col-12 col-md-8">
+              <label class="form-label" for="imagen">Ruta de la carátula</label>
+              <input id="imagen" type="text" class="form-control" name="imagen" maxlength="255"
+                     placeholder="covers/pc_ejemplo.jpg" [(ngModel)]="form.imagen">
+              <div class="form-text text-suave">Archivo dentro de la carpeta <code>public/covers</code>.</div>
+            </div>
+            <div class="col-12 col-md-4">
+              @if (form.imagen) {
+                <img [src]="form.imagen" alt="Vista previa" class="bb-preview">
+              }
+            </div>
+          </div>
+
+          @if (facade.error()) {
+            <div class="alert alert-danger mt-4 mb-0">
+              <i class="bi bi-exclamation-triangle me-2"></i>{{ facade.error() }}
+            </div>
+          }
+
+          <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+            <button type="submit" class="btn btn-bb-primary" [disabled]="facade.guardando()">
+              @if (facade.guardando()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>Guardando...
+              } @else {
+                <i class="bi bi-check-lg me-1"></i>{{ esEdicion ? 'Guardar cambios' : 'Crear videojuego' }}
+              }
+            </button>
+            <a routerLink="/catalogo" class="btn btn-outline-light">Cancelar</a>
+          </div>
+        </form>
       }
-
-      <div class="acciones">
-        <button type="submit" [disabled]="f.invalid || facade.guardando()">
-          {{ facade.guardando() ? 'Guardando...' : (esEdicion ? 'Guardar cambios' : 'Crear videojuego') }}
-        </button>
-        <a routerLink="/catalogo" class="cancelar">Cancelar</a>
-      </div>
-    </form>
-  }
+    </div>
+  </div>
 </section>

@@ -1,20 +1,14 @@
-.formulario { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
-.volver { display: inline-block; margin-bottom: 1rem; color: #2563eb; text-decoration: none; }
-
-form { display: flex; flex-direction: column; gap: 1rem; }
-label { display: flex; flex-direction: column; gap: .3rem; font-weight: 600; flex: 1; }
-input, select, textarea { padding: .5rem .6rem; font: inherit; font-weight: normal; }
-.fila { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.ng-touched {
-  border: 1px solid #b00020;
+.bb-preview {
+  width: 100%;
+  max-width: 140px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--bb-borde);
 }
 
-.acciones { display: flex; align-items: center; gap: 1rem; }
-button { padding: .6rem 1.2rem; cursor: pointer; }
-button:disabled { opacity: .6; cursor: not-allowed; }
-.cancelar { color: #555; }
-
-.error { color: #b00020; font-weight: 600; }
-.mensaje { margin: 0; }
-.info { color: #555; }
+.input-group-text {
+  background: var(--bb-fondo-2);
+  border-color: var(--bb-borde);
+  color: var(--bb-texto-suave);
+}
