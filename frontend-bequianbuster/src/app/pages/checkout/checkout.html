@@ -1,0 +1,139 @@
+<section class="container">
+
+  @if (orden(); as o) {
+    <!-- Comprobante -->
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-7">
+        <div class="bb-panel p-4 p-md-5 text-center">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem"></i>
+          <h1 class="h3 mt-3">¡Compra realizada con éxito!</h1>
+          <p class="text-suave">Orden <strong class="text-bb-acento">{{ o.numero }}</strong> ·
+            {{ o.fecha | date:'dd-MM-yyyy HH:mm' }}</p>
+
+          <ul class="list-group list-group-flush text-start my-4">
+            @for (item of o.items; track item.videojuego.id) {
+              <li class="list-group-item bg-transparent text-light d-flex justify-content-between border-secondary">
+                <span>{{ item.cantidad }} × {{ item.videojuego.titulo }}</span>
+                <span>{{ item.cantidad * item.videojuego.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+              </li>
+            }
+            <li class="list-group-item bg-transparent text-light d-flex justify-content-between border-secondary fw-bold">
+              <span>Total</span><span>{{ o.total | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+            </li>
+          </ul>
+
+          <p class="small text-suave mb-4">
+            Despacho a {{ o.despacho.nombre }} · {{ o.despacho.direccion }}, {{ o.despacho.comuna }}
+          </p>
+          <div class="alert alert-info small text-start">
+            <i class="bi bi-info-circle me-1"></i>Pago simulado: no se procesaron pagos reales.
+          </div>
+          <a routerLink="/catalogo" class="btn btn-bb-primary">Seguir comprando</a>
+        </div>
+      </div>
+    </div>
+
+  } @else if (carrito.items().length === 0) {
+    <div class="bb-panel p-5 text-center">
+      <p class="text-suave mb-3">No hay productos para comprar.</p>
+      <a routerLink="/catalogo" class="btn btn-bb-primary">Ir al catálogo</a>
+    </div>
+
+  } @else {
+    <h1 class="mb-4">Finalizar compra</h1>
+    <div class="row g-4">
+
+      <!-- Datos de despacho -->
+      <div class="col-12 col-lg-7">
+        <form #f="ngForm" (ngSubmit)="confirmar(f)" novalidate class="bb-panel p-4">
+          <h2 class="h5 mb-3">Datos de despacho</h2>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="nombre">Nombre completo</label>
+              <input id="nombre" type="text" class="form-control" name="nombre"
+                     required minlength="3" maxlength="80" [pattern]="patronNombre"
+                     #nombre="ngModel" [(ngModel)]="despacho.nombre"
+                     [class.is-invalid]="nombre.invalid && nombre.touched">
+              <div class="invalid-feedback">
+                @if (nombre.errors?.['required']) { El nombre es obligatorio. }
+                @else if (nombre.errors?.['minlength']) { Debe tener al menos 3 caracteres. }
+                @else { Solo se permiten letras y espacios. }
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="direccion">Dirección</label>
+              <input id="direccion" type="text" class="form-control" name="direccion"
+                     required minlength="5" maxlength="120" placeholder="Calle, número, depto."
+                     #direccion="ngModel" [(ngModel)]="despacho.direccion"
+                     [class.is-invalid]="direccion.invalid && direccion.touched">
+              <div class="invalid-feedback">
+                @if (direccion.errors?.['required']) { La dirección es obligatoria. }
+                @else { Ingresa una dirección más completa. }
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="comuna">Comuna</label>
+              <select id="comuna" class="form-select" name="comuna" required
+                      #comuna="ngModel" [(ngModel)]="despacho.comuna"
+                      [class.is-invalid]="comuna.invalid && comuna.touched">
+                <option value="" disabled>Selecciona una comuna</option>
+                @for (c of comunas; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+              <div class="invalid-feedback">Selecciona una comuna.</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="telefono">Teléfono</label>
+              <input id="telefono" type="tel" class="form-control" name="telefono"
+                     required [pattern]="patronTelefono" placeholder="+56 9 1234 5678"
+                     #telefono="ngModel" [(ngModel)]="despacho.telefono"
+                     [class.is-invalid]="telefono.invalid && telefono.touched">
+              <div class="invalid-feedback">
+                @if (telefono.errors?.['required']) { El teléfono es obligatorio. }
+                @else { Formato válido: +56 9 1234 5678. }
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info small mt-4 mb-4">
+            <i class="bi bi-info-circle me-1"></i>
+            Pago simulado: no se solicitan datos de pago. Al confirmar, se descuenta el stock de los productos.
+          </div>
+
+          @if (error()) {
+            <div class="alert alert-danger small mb-3">
+              <i class="bi bi-exclamation-triangle me-1"></i>{{ error() }}
+            </div>
+          }
+
+          <button type="submit" class="btn btn-bb-primary w-100" [disabled]="procesando()">
+            @if (procesando()) {
+              <span class="spinner-border spinner-border-sm me-1"></span>Procesando compra...
+            } @else {
+              Confirmar compra · {{ carrito.total() | currency:'CLP':'symbol-narrow':'1.0-0' }}
+            }
+          </button>
+        </form>
+      </div>
+
+      <!-- Resumen -->
+      <div class="col-12 col-lg-5">
+        <div class="bb-panel p-4">
+          <h2 class="h5 mb-3">Tu pedido</h2>
+          @for (item of carrito.items(); track item.videojuego.id) {
+            <div class="d-flex justify-content-between small mb-2">
+              <span>{{ item.cantidad }} × {{ item.videojuego.titulo }}</span>
+              <span>{{ item.cantidad * item.videojuego.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+          }
+          <hr class="border-secondary">
+          <div class="d-flex justify-content-between fw-bold">
+            <span>Total</span><span class="text-bb-acento">{{ carrito.total() | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+          <a routerLink="/carrito" class="d-inline-block small mt-3">Modificar carrito</a>
+        </div>
+      </div>
+    </div>
+  }
+</section>

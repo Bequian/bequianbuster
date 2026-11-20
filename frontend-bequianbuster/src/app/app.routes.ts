@@ -8,6 +8,9 @@ import { Registro } from './pages/registro/registro';
 import { Recuperar } from './pages/recuperar/recuperar';
 import { Perfil } from './pages/perfil/perfil';
 import { authGuard } from './guards/auth-guard';
+import { Carrito } from './pages/carrito/carrito';
+import { Checkout } from './pages/checkout/checkout';
+import { rolGuard } from './guards/rol-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'catalogo', pathMatch: 'full' },
@@ -19,5 +22,7 @@ export const routes: Routes = [
   { path: 'registro', component: Registro },
   { path: 'recuperar', component: Recuperar },
   { path: 'perfil', component: Perfil, canActivate: [authGuard] },
+  { path: 'carrito', component: Carrito },
+  { path: 'checkout', component: Checkout, canActivate: [authGuard] },
   { path: '**', redirectTo: 'catalogo' }
 ];

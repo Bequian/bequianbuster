@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -8,6 +8,8 @@ import { PLATAFORMAS } from '../../models/videojuego';
 
 import { Auth } from '../../services/auth';
 import { Videojuego } from '../../models/videojuego';
+
+import { Carrito } from '../../services/carrito';
 
 @Component({
   selector: 'app-catalogo',
@@ -27,6 +29,11 @@ export class Catalogo implements OnInit {
   protected filtroPlataforma = '';
   protected filtroGenero = '';
   protected idBuscado: number | null = null;
+
+  /** Carrito y aviso de acciones */
+  protected readonly carrito = inject(Carrito);
+  protected readonly aviso = signal<{ texto: string; ok: boolean } | null>(null);
+  private temporizadorAviso?: ReturnType<typeof setTimeout>;
 
   
 
@@ -73,4 +80,16 @@ export class Catalogo implements OnInit {
     img.src = 'logo.svg';
     img.classList.add('sin-imagen');
   }
+
+  /** Agrega una unidad al carrito y muestra un aviso temporal. */
+  protected agregarAlCarrito(v: Videojuego): void {
+    const ok = this.carrito.agregar(v);
+    this.aviso.set({
+      texto: ok ? `"${v.titulo}" se agregó al carrito` : `No queda más stock de "${v.titulo}"`,
+      ok
+    });
+    clearTimeout(this.temporizadorAviso);
+    this.temporizadorAviso = setTimeout(() => this.aviso.set(null), 2500);
+  }
+
 }

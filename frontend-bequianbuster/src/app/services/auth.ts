@@ -25,6 +25,7 @@ export class Auth {
   readonly sesion = this._sesion.asReadonly();
   readonly estaAutenticado = computed(() => this._sesion() !== null);
   readonly esAdmin = computed(() => this._sesion()?.rol === 'ADMIN');
+  readonly esCliente = computed(() => this._sesion()?.rol === 'CLIENTE');
 
   /** POST /auth/login con HTTP Basic. Si responde 200, guarda la sesión. */
   login(usuario: string, password: string): Observable<Sesion> {

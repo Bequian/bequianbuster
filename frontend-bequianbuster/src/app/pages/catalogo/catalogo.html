@@ -104,6 +104,12 @@
               <a class="btn btn-sm btn-outline-light flex-fill" [routerLink]="['/videojuego', v.id]">
                 Ver detalle
               </a>
+              @if (auth.esCliente()) {
+                <button type="button" class="btn btn-sm btn-bb-primary" (click)="agregarAlCarrito(v)"
+                        [disabled]="v.stock === 0" title="Agregar al carrito" aria-label="Agregar al carrito">
+                  <i class="bi bi-cart-plus"></i>
+                </button>
+              }
               @if (auth.esAdmin()) {
                 <a class="btn btn-sm btn-outline-info" [routerLink]="['/admin/editar', v.id]"
                    title="Editar" aria-label="Editar">
@@ -119,6 +125,11 @@
           </article>
         </div>
       }
+    </div>
+  }
+    @if (aviso(); as a) {
+    <div class="bb-aviso alert shadow" [class.alert-success]="a.ok" [class.alert-warning]="!a.ok" role="status">
+      <i class="bi me-2" [class.bi-cart-check]="a.ok" [class.bi-exclamation-circle]="!a.ok"></i>{{ a.texto }}
     </div>
   }
 </section>

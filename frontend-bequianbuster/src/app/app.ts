@@ -3,6 +3,8 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 
 import { Auth } from './services/auth';
 
+import { Carrito } from './services/carrito';
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
@@ -18,6 +20,9 @@ export class App {
   protected readonly menuAbierto = signal(false);
   protected readonly anio = new Date().getFullYear();
 
+  /** Carrito de compras. */
+  protected readonly carrito = inject(Carrito);
+
   protected alternarMenu(): void {
     this.menuAbierto.update(abierto => !abierto);
   }
@@ -28,6 +33,7 @@ export class App {
 
   protected salir(): void {
     this.cerrarMenu();
+    this.carrito.vaciar();
     this.auth.cerrarSesion();
     this.router.navigate(['/catalogo']);
   }

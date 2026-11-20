@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import jakarta.validation.Valid;
 
 import com.example.ms_videojuegos.dto.VideojuegoResponse;
+import com.example.ms_videojuegos.dto.CompraRequest;
 import com.example.ms_videojuegos.dto.VideojuegoRequest;
 import com.example.ms_videojuegos.service.VideojuegoService;
 
@@ -118,6 +119,17 @@ public class VideojuegoController {
         videojuegoService.eliminar(id);
         return ResponseEntity.noContent().build();
 
+    }
+
+    /**
+    * Compra (pago simulado): descuenta el stock de los videojuegos comprados.
+    * @return los videojuegos con su stock actualizado.
+    */
+    @PostMapping("/compra")
+    public List<VideojuegoResponse> comprar(@Valid @RequestBody CompraRequest datos) {
+        return videojuegoService.comprar(datos).stream()
+            .map(VideojuegoResponse::de)
+            .toList();
     }
 
 }

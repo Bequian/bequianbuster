@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.servlet.http.HttpServletRequest;
+import com.example.ms_videojuegos.error.StockInsuficienteException;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -60,5 +61,11 @@ public class ErrorHandler {
 
         return ResponseEntity.status(status).body(new ErrorResponse(Instant.now(),status.value(),msg,req.getRequestURI(),datos));
 
+    }
+
+    /** 409: no hay stock suficiente para completar la compra. */
+    @ExceptionHandler(StockInsuficienteException.class)
+    public ResponseEntity<ErrorResponse> sinStock(StockInsuficienteException ex, HttpServletRequest req) {
+        return response(HttpStatus.CONFLICT, ex.getMessage(), req, Map.of());
     }
 }
