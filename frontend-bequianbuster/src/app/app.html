@@ -24,10 +24,10 @@
       <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
         @if (auth.sesion(); as s) {
           <li class="nav-item">
-            <span class="navbar-text">
+            <a class="nav-link" routerLink="/perfil" routerLinkActive="active" (click)="cerrarMenu()">
               <i class="bi bi-person-circle me-1"></i>{{ s.usuario }}
               <span class="badge bg-bb-acento ms-1">{{ s.rol }}</span>
-            </span>
+            </a>
           </li>
           <li class="nav-item">
             <button type="button" class="btn btn-outline-light btn-sm" (click)="salir()">
@@ -38,6 +38,11 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/login" routerLinkActive="active" (click)="cerrarMenu()">
               <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-bb-primary btn-sm" routerLink="/registro" (click)="cerrarMenu()">
+              Crear cuenta
             </a>
           </li>
         }

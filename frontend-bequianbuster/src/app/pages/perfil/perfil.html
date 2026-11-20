@@ -1,0 +1,113 @@
+<section class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8">
+      <h1 class="mb-4">Mi perfil</h1>
+
+      @if (cargando()) {
+        <div class="text-center py-5"><div class="spinner-border text-info"></div></div>
+      } @else if (cuenta(); as c) {
+        <div class="row g-4">
+
+          <!-- Tarjeta de la cuenta: arriba en móvil, a la izquierda desde md -->
+          <div class="col-12 col-md-4">
+            <div class="bb-panel p-4 text-center h-100">
+              <div class="bb-avatar mb-3">{{ c.username.charAt(0).toUpperCase() }}</div>
+              <h2 class="h5 mb-1">{{ c.username }}</h2>
+              <span class="badge bg-bb-acento">{{ c.rol }}</span>
+              <p class="text-suave small mt-3 mb-0">{{ c.email }}</p>
+            </div>
+          </div>
+
+          <!-- Formulario -->
+          <div class="col-12 col-md-8">
+            <form #f="ngForm" (ngSubmit)="guardar(f)" novalidate class="bb-panel p-4">
+
+              <div class="mb-3">
+                <label class="form-label" for="usuario">Nombre de usuario</label>
+                <input id="usuario" type="text" class="form-control" [value]="c.username" disabled>
+                <div class="form-text text-suave">El nombre de usuario no se puede modificar.</div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label" for="email">Correo electrónico</label>
+                <input id="email" type="email" class="form-control" name="email"
+                       required maxlength="120" [pattern]="patronEmail"
+                       #emailCtrl="ngModel" [(ngModel)]="email"
+                       [class.is-invalid]="(emailCtrl.invalid && emailCtrl.touched) || erroresCampos()['email']">
+                <div class="invalid-feedback">
+                  @if (emailCtrl.errors?.['required']) { El correo es obligatorio. }
+                  @else if (emailCtrl.errors?.['pattern']) { Ingresa un correo válido (ej: usuario@dominio.cl). }
+                  @else { {{ erroresCampos()['email'] }} }
+                </div>
+              </div>
+
+              <div class="form-check form-switch mb-3">
+                <input id="cambiar" type="checkbox" class="form-check-input" name="cambiarPassword"
+                       [(ngModel)]="cambiarPassword">
+                <label class="form-check-label" for="cambiar">Cambiar contraseña</label>
+              </div>
+
+              @if (cambiarPassword) {
+                <div class="bb-seccion-password p-3 mb-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="actual">Contraseña actual</label>
+                    <input id="actual" type="password" class="form-control" name="passwordActual"
+                           required autocomplete="current-password"
+                           #actual="ngModel" [(ngModel)]="passwordActual"
+                           [class.is-invalid]="actual.invalid && actual.touched">
+                    <div class="invalid-feedback">Ingresa tu contraseña actual.</div>
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label" for="nueva">Nueva contraseña</label>
+                    <input id="nueva" type="password" class="form-control" name="passwordNueva"
+                           required maxlength="72" appPasswordSegura autocomplete="new-password"
+                           #nueva="ngModel" [(ngModel)]="passwordNueva"
+                           [class.is-invalid]="(nueva.invalid && nueva.touched) || erroresCampos()['passwordNueva']">
+                    <div class="invalid-feedback">
+                      @if (nueva.errors?.['required']) { Ingresa la nueva contraseña. }
+                      @else if (nueva.errors?.['passwordInsegura']) { La contraseña no cumple todas las reglas. }
+                      @else { {{ erroresCampos()['passwordNueva'] }} }
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <app-reglas-password [password]="passwordNueva" />
+                  </div>
+
+                  <div>
+                    <label class="form-label" for="confirmar">Confirmar nueva contraseña</label>
+                    <input id="confirmar" type="password" class="form-control" name="confirmacion"
+                           required autocomplete="new-password"
+                           #confirmar="ngModel" [(ngModel)]="confirmacion"
+                           [class.is-invalid]="confirmar.touched && (confirmar.invalid || !coinciden)">
+                    <div class="invalid-feedback">
+                      @if (confirmar.errors?.['required']) { Repite la nueva contraseña. }
+                      @else { Las contraseñas no coinciden. }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (exito()) {
+                <div class="alert alert-success py-2 small"><i class="bi bi-check-circle me-1"></i>{{ exito() }}</div>
+              }
+              @if (error()) {
+                <div class="alert alert-danger py-2 small"><i class="bi bi-exclamation-triangle me-1"></i>{{ error() }}</div>
+              }
+
+              <button type="submit" class="btn btn-bb-primary" [disabled]="guardando()">
+                @if (guardando()) {
+                  <span class="spinner-border spinner-border-sm me-1"></span>Guardando...
+                } @else {
+                  <i class="bi bi-check-lg me-1"></i>Guardar cambios
+                }
+              </button>
+            </form>
+          </div>
+        </div>
+      } @else if (error()) {
+        <div class="alert alert-danger">{{ error() }}</div>
+      }
+    </div>
+  </div>
+</section>

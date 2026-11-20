@@ -1,0 +1,24 @@
+.bb-avatar {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--bb-primario), var(--bb-acento));
+}
+
+.bb-seccion-password {
+  border: 1px dashed var(--bb-borde);
+  border-radius: 10px;
+  background: var(--bb-fondo-2);
+}
+
+.form-control:disabled {
+  background-color: var(--bb-fondo);
+  color: var(--bb-texto-suave);
+}

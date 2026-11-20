@@ -1,0 +1,111 @@
+<section class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+      <div class="bb-panel p-4 p-md-5">
+
+        <div class="text-center mb-4">
+          <img src="logo.svg" alt="Logo BequianBuster" width="56" height="56" class="mb-3">
+          <h1 class="h3 mb-1">Crear cuenta</h1>
+          <p class="text-suave small mb-0">Únete a BequianBuster y arma tu colección</p>
+        </div>
+
+        <form #f="ngForm" (ngSubmit)="registrar(f)" novalidate>
+
+          <!-- Usuario -->
+          <div class="mb-3">
+            <label class="form-label" for="username">Nombre de usuario</label>
+            <input id="username" type="text" class="form-control" name="username"
+                   required minlength="3" maxlength="50" [pattern]="patronUsername" autocomplete="username"
+                   #username="ngModel" [(ngModel)]="datos.username"
+                   [class.is-invalid]="(username.invalid && username.touched) || erroresCampos()['username']">
+            <div class="invalid-feedback">
+              @if (username.errors?.['required']) { El nombre de usuario es obligatorio. }
+              @else if (username.errors?.['minlength']) { Debe tener al menos 3 caracteres. }
+              @else if (username.errors?.['pattern']) { Debe comenzar con una letra; solo letras, números, punto, guion y guion bajo. }
+              @else { {{ erroresCampos()['username'] }} }
+            </div>
+          </div>
+
+          <!-- Correo -->
+          <div class="mb-3">
+            <label class="form-label" for="email">Correo electrónico</label>
+            <input id="email" type="email" class="form-control" name="email"
+                   required maxlength="120" [pattern]="patronEmail" autocomplete="email"
+                   placeholder="usuario@dominio.cl"
+                   #email="ngModel" [(ngModel)]="datos.email"
+                   [class.is-invalid]="(email.invalid && email.touched) || erroresCampos()['email']">
+            <div class="invalid-feedback">
+              @if (email.errors?.['required']) { El correo es obligatorio. }
+              @else if (email.errors?.['pattern']) { Ingresa un correo válido (ej: usuario@dominio.cl). }
+              @else { {{ erroresCampos()['email'] }} }
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="mb-2">
+            <label class="form-label" for="password">Contraseña</label>
+            <div class="input-group has-validation">
+              <input id="password" class="form-control" name="password"
+                     [type]="verPassword() ? 'text' : 'password'"
+                     required maxlength="72" appPasswordSegura autocomplete="new-password"
+                     #password="ngModel" [(ngModel)]="datos.password"
+                     [class.is-invalid]="(password.invalid && password.touched) || erroresCampos()['password']">
+              <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar contraseña"
+                      (click)="verPassword.set(!verPassword())">
+                <i class="bi" [class.bi-eye]="!verPassword()" [class.bi-eye-slash]="verPassword()"></i>
+              </button>
+              <div class="invalid-feedback">
+                @if (password.errors?.['required']) { La contraseña es obligatoria. }
+                @else if (password.errors?.['passwordInsegura']) { La contraseña no cumple todas las reglas. }
+                @else { {{ erroresCampos()['password'] }} }
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <app-reglas-password [password]="datos.password" />
+          </div>
+
+          <!-- Confirmación -->
+          <div class="mb-3">
+            <label class="form-label" for="confirmacion">Confirmar contraseña</label>
+            <input id="confirmacion" class="form-control" name="confirmacion"
+                   [type]="verPassword() ? 'text' : 'password'" required autocomplete="new-password"
+                   #confirmar="ngModel" [(ngModel)]="confirmacion"
+                   [class.is-invalid]="confirmar.touched && (confirmar.invalid || !coinciden)">
+            <div class="invalid-feedback">
+              @if (confirmar.errors?.['required']) { Repite la contraseña. }
+              @else { Las contraseñas no coinciden. }
+            </div>
+          </div>
+
+          <!-- Términos -->
+          <div class="form-check mb-4">
+            <input id="terminos" type="checkbox" class="form-check-input" name="terminos" required
+                   #terminos="ngModel" [(ngModel)]="aceptaTerminos"
+                   [class.is-invalid]="terminos.invalid && terminos.touched">
+            <label class="form-check-label small" for="terminos">
+              Acepto los términos y condiciones de BequianBuster
+            </label>
+            <div class="invalid-feedback">Debes aceptar los términos para continuar.</div>
+          </div>
+
+          @if (error()) {
+            <div class="alert alert-danger py-2 small"><i class="bi bi-exclamation-triangle me-1"></i>{{ error() }}</div>
+          }
+
+          <button type="submit" class="btn btn-bb-primary w-100" [disabled]="enviando()">
+            @if (enviando()) {
+              <span class="spinner-border spinner-border-sm me-1"></span>Creando cuenta...
+            } @else {
+              Crear cuenta
+            }
+          </button>
+        </form>
+
+        <p class="text-center text-suave small mt-4 mb-0">
+          ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
