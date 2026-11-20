@@ -1,5 +1,72 @@
+/* =====================================================================
+   BequianBuster – Identidad visual
+   Paleta: fondo oscuro, violeta como color principal y cian de acento.
+   ===================================================================== */
+:root {
+  --bb-fondo: #0f0a1f;
+  --bb-fondo-2: #1a1333;
+  --bb-superficie: #221a40;
+  --bb-borde: #3a2f63;
+  --bb-primario: #8b5cf6;
+  --bb-primario-oscuro: #6d28d9;
+  --bb-acento: #06b6d4;
+  --bb-texto: #ece9f7;
+  --bb-texto-suave: #a59fc4;
+  --bb-peligro: #f43f5e;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: #1f2937;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bb-fondo);
+  color: var(--bb-texto);
+  font-family: "Inter", system-ui, sans-serif;
 }
+
+h1, h2, h3, h4, .bb-marca {
+  font-family: "Rajdhani", "Inter", sans-serif;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+a { color: var(--bb-acento); }
+a:hover { color: #67e8f9; }
+
+.text-suave { color: var(--bb-texto-suave) !important; }
+.text-bb-acento { color: var(--bb-acento); }
+.bg-bb-acento { background: var(--bb-acento); color: #04222a; }
+
+/* Botones de la marca */
+.btn-bb-primary {
+  background: linear-gradient(135deg, var(--bb-primario), var(--bb-primario-oscuro));
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.btn-bb-primary:hover,
+.btn-bb-primary:focus { color: #fff; filter: brightness(1.12); }
+.btn-bb-primary:disabled { opacity: .55; }
+
+/* Tarjetas y paneles */
+.bb-panel {
+  background: var(--bb-superficie);
+  border: 1px solid var(--bb-borde);
+  border-radius: 14px;
+}
+
+/* Formularios sobre fondo oscuro */
+.form-control, .form-select {
+  background-color: var(--bb-fondo-2);
+  border-color: var(--bb-borde);
+  color: var(--bb-texto);
+}
+.form-control:focus, .form-select:focus {
+  background-color: var(--bb-fondo-2);
+  color: var(--bb-texto);
+  border-color: var(--bb-primario);
+  box-shadow: 0 0 0 .2rem rgba(139, 92, 246, .25);
+}
+.form-control::placeholder { color: #6f6893; }
+.form-label { font-weight: 500; }

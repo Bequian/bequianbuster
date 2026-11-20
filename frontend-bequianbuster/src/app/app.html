@@ -1,17 +1,58 @@
-<header class="barra">
-  <a routerLink="/catalogo" class="marca">🎮 BequianBuster</a>
-  <nav>
-    <a routerLink="/catalogo">Catálogo</a>
+<nav class="navbar navbar-expand-lg navbar-dark bb-navbar sticky-top">
+  <div class="container">
 
-    @if (auth.sesion(); as s) {
-      <span class="usuario">{{ s.usuario }} ({{ s.rol }})</span>
-      <button type="button" class="salir" (click)="salir()">Cerrar sesión</button>
-    } @else {
-      <a routerLink="/login">Iniciar sesión</a>
-    }
-  </nav>
-</header>
+    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/catalogo" (click)="cerrarMenu()">
+      <img src="logo.svg" alt="Logo BequianBuster" width="38" height="38">
+      <span class="bb-marca fs-4">Bequian<span class="text-bb-acento">Buster</span></span>
+    </a>
 
-<main>
+    <!-- Botón hamburguesa: visible solo en pantallas menores a lg (992px) -->
+    <button class="navbar-toggler" type="button" aria-label="Abrir menú"
+            [attr.aria-expanded]="menuAbierto()" (click)="alternarMenu()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" [class.show]="menuAbierto()">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/catalogo" routerLinkActive="active" (click)="cerrarMenu()">
+            <i class="bi bi-controller me-1"></i>Catálogo
+          </a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+        @if (auth.sesion(); as s) {
+          <li class="nav-item">
+            <span class="navbar-text">
+              <i class="bi bi-person-circle me-1"></i>{{ s.usuario }}
+              <span class="badge bg-bb-acento ms-1">{{ s.rol }}</span>
+            </span>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="btn btn-outline-light btn-sm" (click)="salir()">
+              <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+            </button>
+          </li>
+        } @else {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active" (click)="cerrarMenu()">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="bb-main">
   <router-outlet />
 </main>
+
+<footer class="bb-footer">
+  <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+    <span class="bb-marca">Bequian<span class="text-bb-acento">Buster</span></span>
+    <span class="text-suave small">© {{ anio }} · Tienda de videojuegos · Proyecto Desarrollo Full Stack III</span>
+  </div>
+</footer>

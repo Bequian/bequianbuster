@@ -1,13 +1,17 @@
-.barra {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: .8rem 1.5rem; background: #1f2937; color: #fff;
+.bb-navbar {
+  background: rgba(15, 10, 31, .92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--bb-borde);
 }
-.barra a { color: #fff; text-decoration: none; margin-left: 1rem; }
-.marca { font-weight: 700; margin-left: 0 !important; }
 
-.barra nav { display: flex; align-items: center; }
-.usuario { margin-left: 1rem; color: #d1d5db; }
-.salir {
-  margin-left: 1rem; padding: .35rem .7rem; cursor: pointer;
-  background: transparent; color: #fff; border: 1px solid #6b7280; border-radius: 4px;
+.bb-navbar .nav-link { color: var(--bb-texto-suave); font-weight: 500; }
+.bb-navbar .nav-link:hover,
+.bb-navbar .nav-link.active { color: var(--bb-texto); }
+
+.bb-main { flex: 1; padding: 2rem 0; }
+
+.bb-footer {
+  border-top: 1px solid var(--bb-borde);
+  background: var(--bb-fondo-2);
+  padding: 1.25rem 0;
 }
