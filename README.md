@@ -599,30 +599,114 @@ cd ms-catalogo
 
 ---
 
+## ✅ Pruebas unitarias
+
+Pruebas de las reglas de negocio con **JUnit 5**, **Mockito** y **AssertJ**. El repositorio se reemplaza por un mock, así que no requieren Oracle.
+
+| Microservicio | Clase | Qué comprueba |
+|---|---|---|
+| `ms-videojuegos` | `VideojuegoServiceTest` (9) | Búsqueda de ID inexistente, normalización de filtros, actualización conserva el ID, eliminación del registro correcto, compra descuenta stock, stock insuficiente y compra "todo o nada" |
+| `ms-usuarios` | `UserServiceTest` (8) | Registro fuerza `CLIENTE` y guarda hash BCrypt, duplicados (409), cambio de contraseña con la actual incorrecta (400) y correcta, correo de otra cuenta (409), protección del último `ADMIN` |
+
+```powershell
+cd ms-videojuegos
+.\mvnw.cmd test "-Dtest=VideojuegoServiceTest"
+
+cd ..\ms-usuarios
+.\mvnw.cmd test "-Dtest=UserServiceTest"
+```
+
 ## 🧪 Pruebas en Postman
 
-### Seguridad
+Colección: `Postman/Bequian Buster.postman_collection.json`
+Environment (plantilla sin valores): `Postman/Entorno BB.postman_environment.json`
 
-| Caso | Petición | Credenciales | Resultado esperado |
-|---|---|---|---|
-| Consulta pública | `GET :8080/videojuego` | Ninguna | 200 OK |
-| Sin autenticación | `POST :8080/videojuego` | Ninguna | 401 Unauthorized |
-| Rol insuficiente | `POST :8080/videojuego` | `cliente1` | 403 Forbidden |
-| Rol correcto | `POST :8080/videojuego` | `admin` | 201 Created |
-| Validación | `POST :8080/videojuego` con datos inválidos | `admin` | 400 Bad Request |
-| Perfil | `GET :8081/auth/perfil` | `cliente1` | 200 OK |
+Las credenciales se cargan como variables del environment (`{{adminUser}}`, `{{adminPass}}`, etc.), completadas solo en *Current value*; la colección no contiene contraseñas.
 
-### Validaciones de usuarios (`POST :8081/usuarios` con `admin`)
+### Solo lectura (público)
 
-| Caso | Dato enviado | Resultado esperado |
+| Caso | Petición | Esperado |
 |---|---|---|
-| Correo sin extensión | `"email": "test@duoc"` | 400 – formato de correo |
-| Contraseña débil | `"password": "12345678"` | 400 – mayúscula, minúscula y número |
-| Rol inexistente | `"rol": "VENDEDOR"` | 400 – debe ser ADMIN o CLIENTE |
-| Rol en minúsculas | `"rol": "cliente"` | 201 – se guarda como CLIENTE |
-| Username con número al inicio | `"username": "1usuario"` | 400 – debe comenzar con letra |
-| Username o correo repetido | Datos de una cuenta existente | 409 Conflict |
-| Datos válidos | Todos los campos correctos | 201 Created |
+| Catálogo completo | `GET :8080/videojuego` | 200 |
+| Videojuego por ID | `GET :8080/videojuego/10` | 200 |
+| Búsqueda por título | `GET :8080/videojuego/buscar?titulo=witcher` | 200 |
+| Búsqueda por plataforma | `GET :8080/videojuego/buscar?plataforma=PC` | 200 |
+| Producto inexistente | `GET :8080/videojuego/99` | 404 |
+| Estado de ms-usuarios | `GET :8081/estado` | 200 |
+
+### Autenticación y privilegios
+
+| Caso | Petición | Credenciales | Esperado |
+|---|---|---|---|
+| Perfil de administrador | `GET :8081/auth/perfil` | admin | 200 – rol `ADMIN` |
+| Perfil de cliente | `GET :8081/auth/perfil` | cliente1 | 200 – rol `CLIENTE` |
+| Perfil sin identificar | `GET :8081/auth/perfil` | Ninguna | 401 |
+| Cliente no administra usuarios | `GET :8081/usuarios` | cliente1 | 403 |
+| Admin lista usuarios | `GET :8081/usuarios` | admin | 200 |
+| Cliente no crea videojuegos | `POST :8080/videojuego` | cliente1 | 403 |
+| Sin autenticación no crea videojuegos | `POST :8080/videojuego` | Ninguna | 401 |
+
+### CRUD de videojuegos (`admin`)
+
+| Caso | Petición | Esperado |
+|---|---|---|
+| Datos inválidos | `POST :8080/videojuego` con título vacío | 400 – errores por campo |
+| Crear videojuego temporal | `POST :8080/videojuego` | 201 – guarda `idVideojuego` |
+| Consultar el creado | `GET :8080/videojuego/{{idVideojuego}}` | 200 |
+| Actualizar | `PUT :8080/videojuego/{{idVideojuego}}` | 200 |
+| Eliminar | `DELETE :8080/videojuego/{{idVideojuego}}` | 204 |
+| Consultar el eliminado | `GET :8080/videojuego/{{idVideojuego}}` | 404 |
+
+### CRUD de usuarios (`admin`)
+
+| Caso | Petición | Esperado |
+|---|---|---|
+| Crear usuario | `POST :8081/usuarios` | 201 – guarda `idUsuario` |
+| Crear usuario duplicado | `POST :8081/usuarios` | 409 |
+| Consultar el creado | `GET :8081/usuarios/{{idUsuario}}` | 200 |
+| Actualizar correo | `PUT :8081/usuarios/{{idUsuario}}` | 200 |
+| Eliminar | `DELETE :8081/usuarios/{{idUsuario}}` | 204 |
+| Consultar el eliminado | `GET :8081/usuarios/{{idUsuario}}` | 404 |
+
+### Registro y perfil propio (Semana 5)
+
+| Caso | Petición | Credenciales | Esperado |
+|---|---|---|---|
+| Registro público | `POST :8081/auth/registro` | Ninguna | 201 – rol `CLIENTE` |
+| Registro enviando `"rol":"ADMIN"` | `POST :8081/auth/registro` | Ninguna | 201 – se guarda como `CLIENTE` |
+| Contraseña sin carácter especial | `POST :8081/auth/registro` | Ninguna | 400 – política de contraseñas |
+| Registro duplicado | `POST :8081/auth/registro` | Ninguna | 409 |
+| Obtener la cuenta propia | `GET :8081/auth/cuenta` | jugador | 200 |
+| Modificar el correo | `PUT :8081/auth/perfil` | jugador | 200 |
+| Cambiar contraseña con la actual incorrecta | `PUT :8081/auth/perfil` | jugador | 400 – sin cerrar la sesión |
+| Cambiar contraseña con la actual correcta | `PUT :8081/auth/perfil` | jugador | 200 |
+| Cliente no crea videojuegos | `POST :8080/videojuego` | cliente1 | 403 |
+
+### Compra con descuento de stock (Semana 5)
+
+| Caso | Petición | Credenciales | Esperado |
+|---|---|---|---|
+| Admin no compra | `POST :8080/videojuego/compra` | admin | 403 |
+| Cantidad mayor al stock | `POST :8080/videojuego/compra` – 1 producto con cantidad 999 | cliente1 | 409 – stock insuficiente |
+| Compra "todo o nada" | `POST :8080/videojuego/compra` – 2 productos, el segundo sin stock | cliente1 | 409 – el primero tampoco se descuenta |
+| Compra sin productos | `POST :8080/videojuego/compra` con `"items": []` | cliente1 | 400 |
+
+### ms-catalogo – generado con el arquetipo (Semana 4, sin autenticación)
+
+| Caso | Petición | Esperado |
+|---|---|---|
+| Catálogo | `GET :8082/videojuego` | 200 |
+| Ordenado por precio | `GET :8082/videojuego?orden=precio` | 200 |
+| Ordenado por fecha | `GET :8082/videojuego?orden=fecha` | 200 |
+| Orden no permitido | `GET :8082/videojuego?orden=color` | 400 – lista los órdenes válidos |
+| Buscar por ID | `GET :8082/videojuego/1` | 200 |
+| ID inexistente | `GET :8082/videojuego/999` | 404 |
+| Crear | `POST :8082/videojuego` | 201 |
+| Editar stock | `PUT :8082/videojuego/{{idVideojuego}}` | 200 |
+| Plataforma no permitida | `PUT :8082/videojuego/{{idVideojuego}}` con `"PS3"` | 400 |
+| Eliminar | `DELETE :8082/videojuego/{{idVideojuego}}` | 204 |
+
+> Contra los contenedores Docker, las URLs son las mismas (`localhost:8080` y `localhost:8081`), porque `compose.yaml` publica esos puertos.
 
 ---
 
