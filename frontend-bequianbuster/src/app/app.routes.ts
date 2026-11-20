@@ -11,6 +11,7 @@ import { authGuard } from './guards/auth-guard';
 import { Carrito } from './pages/carrito/carrito';
 import { Checkout } from './pages/checkout/checkout';
 import { rolGuard } from './guards/rol-guard';
+import { Usuarios } from './pages/usuarios/usuarios';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'catalogo', pathMatch: 'full' },
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'perfil', component: Perfil, canActivate: [authGuard] },
   { path: 'carrito', component: Carrito },
   { path: 'checkout', component: Checkout, canActivate: [authGuard] },
+  { path: 'admin/usuarios', component: Usuarios, canActivate: [rolGuard('ADMIN')] },
   { path: '**', redirectTo: 'catalogo' }
 ];

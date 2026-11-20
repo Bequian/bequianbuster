@@ -127,7 +127,7 @@
       }
     </div>
   }
-    @if (aviso(); as a) {
+  @if (aviso(); as a) {
     <div class="bb-aviso alert shadow" [class.alert-success]="a.ok" [class.alert-warning]="!a.ok" role="status">
       <i class="bi me-2" [class.bi-cart-check]="a.ok" [class.bi-exclamation-circle]="!a.ok"></i>{{ a.texto }}
     </div>

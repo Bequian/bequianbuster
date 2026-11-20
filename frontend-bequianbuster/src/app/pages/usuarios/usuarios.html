@@ -1,0 +1,133 @@
+<section class="container">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+    <div>
+      <h1 class="mb-1"><i class="bi bi-people me-2"></i>Gestión de usuarios</h1>
+      <p class="text-suave mb-0">Administra las cuentas y roles de BequianBuster</p>
+    </div>
+    <button type="button" class="btn btn-outline-light" (click)="cargar()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+    </button>
+  </div>
+
+  <!-- Indicadores: 1 por fila en móvil, 3 en una fila desde sm -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-4">
+      <div class="bb-panel p-3 bb-indicador">
+        <i class="bi bi-people"></i>
+        <div><small>Total de cuentas</small><strong>{{ usuarios().length }}</strong></div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-4">
+      <div class="bb-panel p-3 bb-indicador">
+        <i class="bi bi-shield-check"></i>
+        <div><small>Administradores</small><strong>{{ totalAdmins() }}</strong></div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-4">
+      <div class="bb-panel p-3 bb-indicador">
+        <i class="bi bi-person"></i>
+        <div><small>Clientes</small><strong>{{ totalClientes() }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bb-panel p-3 mb-4">
+    <div class="row g-2">
+      <div class="col-12 col-md-8">
+        <input type="search" class="form-control" placeholder="Buscar por usuario o correo"
+               [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)">
+      </div>
+      <div class="col-12 col-md-4">
+        <select class="form-select" [ngModel]="filtroRol()" (ngModelChange)="filtroRol.set($event)">
+          <option value="">Todos los roles</option>
+          <option value="ADMIN">Administradores</option>
+          <option value="CLIENTE">Clientes</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (exito()) {
+    <div class="alert alert-success py-2"><i class="bi bi-check-circle me-1"></i>{{ exito() }}</div>
+  }
+  @if (error()) {
+    <div class="alert alert-danger py-2"><i class="bi bi-exclamation-triangle me-1"></i>{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <div class="text-center py-5"><div class="spinner-border text-info"></div></div>
+  } @else if (filtrados().length === 0) {
+    <div class="text-center text-suave py-5">No hay cuentas que coincidan con los filtros.</div>
+  } @else {
+
+    <!-- Tabla: tablet y escritorio (md en adelante) -->
+    <div class="bb-panel d-none d-md-block">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0 bb-tabla">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Correo</th>
+              <th style="width: 170px">Rol</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of filtrados(); track u.id) {
+              <tr>
+                <td class="text-suave">#{{ u.id }}</td>
+                <td>
+                  {{ u.username }}
+                  @if (esPropia(u)) { <span class="badge text-bg-secondary ms-1">Tú</span> }
+                </td>
+                <td>{{ u.email }}</td>
+                <td>
+                  <select class="form-select form-select-sm" [ngModel]="u.rol" [disabled]="esPropia(u)"
+                          (ngModelChange)="cambiarRol(u, $event)" [attr.aria-label]="'Rol de ' + u.username">
+                    <option value="CLIENTE">CLIENTE</option>
+                    <option value="ADMIN">ADMIN</option>
+                  </select>
+                </td>
+                <td class="text-end">
+                  <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="esPropia(u)"
+                          (click)="eliminar(u)" [attr.aria-label]="'Eliminar ' + u.username">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tarjetas: solo en móvil (menos de md) -->
+    <div class="d-md-none d-flex flex-column gap-3">
+      @for (u of filtrados(); track u.id) {
+        <div class="bb-panel p-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <strong>{{ u.username }}</strong>
+              @if (esPropia(u)) { <span class="badge text-bg-secondary ms-1">Tú</span> }
+              <div class="small text-suave">{{ u.email }}</div>
+            </div>
+            <span class="text-suave small">#{{ u.id }}</span>
+          </div>
+          <div class="d-flex gap-2">
+            <select class="form-select form-select-sm" [ngModel]="u.rol" [disabled]="esPropia(u)"
+                    (ngModelChange)="cambiarRol(u, $event)" [attr.aria-label]="'Rol de ' + u.username">
+              <option value="CLIENTE">CLIENTE</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="esPropia(u)"
+                    (click)="eliminar(u)" [attr.aria-label]="'Eliminar ' + u.username">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>
