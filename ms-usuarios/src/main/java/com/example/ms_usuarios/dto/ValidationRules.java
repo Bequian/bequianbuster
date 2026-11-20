@@ -12,7 +12,7 @@ public final class ValidationRules {
         "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
     public static final String PASSWORD =
-        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$";
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9\\s])(?!.*\\s).+$";
 
     public static final String USERNAME =
         "^[A-Za-z][A-Za-z0-9._-]*$";

@@ -14,6 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.http.HttpMethod;
+
 /**
  * Configuración de seguridad para la aplicación.
  * Define las reglas de acceso a las rutas, la gestión de sesiones y el cifrado de contraseñas.
@@ -46,8 +48,9 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(a -> a
                 .requestMatchers("/estado").permitAll()
-                .requestMatchers("/auth/perfil","/auth/login").authenticated()
-                .requestMatchers("/usuarios","/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
+                .requestMatchers("/auth/perfil", "/auth/login", "/auth/cuenta").authenticated()
+                .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
                 .anyRequest().denyAll())
             .httpBasic(Customizer.withDefaults());
         return http.build();
