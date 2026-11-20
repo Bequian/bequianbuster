@@ -16,6 +16,9 @@ import com.example.ms_usuarios.model.Rol;
 import com.example.ms_usuarios.model.User;
 import com.example.ms_usuarios.repository.UserRepository;
 
+import com.example.ms_usuarios.dto.PerfilUpdateRequest;
+import com.example.ms_usuarios.dto.RegistroRequest;
+
 /**
  * Servicio de gestión de usuarios.
  * Proporciona métodos para listar, buscar, crear, actualizar y eliminar usuarios.
@@ -103,5 +106,49 @@ public class UserService {
         }
         repo.delete(actual);
         log.info("Cuenta eliminada id={}",id);
+    }
+
+        /** Registro público: reutiliza crear() forzando el rol CLIENTE. */
+    @Transactional
+    public UserResponse registrar(RegistroRequest req) {
+        return crear(new UserCreateRequest(req.username(), req.email(), req.password(), Rol.CLIENTE));
+    }
+
+    /** Datos de la cuenta del usuario autenticado. */
+    @Transactional(readOnly = true)
+    public UserResponse cuenta(String username) {
+        return UserResponse.de(porUsername(username));
+    }
+
+    /**
+     * El usuario autenticado actualiza su propio correo y, opcionalmente,
+     * su contraseña (para esto debe confirmar la contraseña actual).
+     */
+    @Transactional
+    public UserResponse actualizarPerfil(String username, PerfilUpdateRequest req) {
+        User actual = porUsername(username);
+
+        String email = req.email().toLowerCase(Locale.ROOT);
+        if (!actual.getEmail().equals(email) && repo.existsByEmail(email)) {
+            throw new BussinessException(HttpStatus.CONFLICT, "Correo ya registrado");
+        }
+        actual.setEmail(email);
+
+        if (req.passwordNueva() != null && !req.passwordNueva().isBlank()) {
+            if (req.passwordActual() == null
+                    || !encoder.matches(req.passwordActual(), actual.getPassHash())) {
+                throw new BussinessException(HttpStatus.BAD_REQUEST, "La contraseña actual no es correcta");
+            }
+            actual.setPassHash(encoder.encode(req.passwordNueva()));
+        }
+
+        User guardado = repo.save(actual);
+        log.info("Perfil actualizado por el usuario id={}", guardado.getId());
+        return UserResponse.de(guardado);
+    }
+
+    private User porUsername(String username) {
+        return repo.findByUsername(username.toLowerCase(Locale.ROOT))
+            .orElseThrow(() -> new BussinessException(HttpStatus.NOT_FOUND, "Cuenta no encontrada"));
     }
 }

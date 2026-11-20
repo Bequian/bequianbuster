@@ -149,7 +149,7 @@ export class CatalogoFacade {
         break;
       case 400:
         // Errores de validación por campo (mapa "campos" del ErrorResponse)
-        this._erroresCampos.set(err.error?.campos ?? {});
+        this._erroresCampos.set(err.error?.datos ?? err.error?.campos ?? {});
         mensaje = err.error?.mensaje ?? 'Los datos enviados no son válidos.';
         break;
       case 401:

@@ -1,25 +1,66 @@
-<section class="login">
-  <h1>Iniciar sesión</h1>
+<section class="container">
+  <div class="row justify-content-center">
+    <!-- Ancho del formulario: completo en móvil, más angosto en pantallas grandes -->
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+      <div class="bb-panel p-4 p-md-5">
 
-  <form #form="ngForm" (ngSubmit)="ingresar()">
-    <label>
-      Usuario
-      <input type="text" name="usuario" required autocomplete="username"
-             [(ngModel)]="usuario">
-    </label>
+        <div class="text-center mb-4">
+          <img src="logo.svg" alt="Logo BequianBuster" width="64" height="64" class="mb-3">
+          <h1 class="h3 mb-1">Iniciar sesión</h1>
+          <p class="text-suave small mb-0">Bienvenido de vuelta a BequianBuster</p>
+        </div>
 
-    <label>
-      Contraseña
-      <input type="password" name="password" required autocomplete="current-password"
-             [(ngModel)]="password">
-    </label>
+        <form #f="ngForm" (ngSubmit)="ingresar(f)" novalidate>
 
-    @if (error()) {
-      <p class="error">{{ error() }}</p>
-    }
+          <div class="mb-3">
+            <label class="form-label" for="usuario">Usuario</label>
+            <input id="usuario" type="text" class="form-control" name="usuario"
+                   required autocomplete="username"
+                   #usuarioCtrl="ngModel" [(ngModel)]="usuario"
+                   [class.is-invalid]="usuarioCtrl.invalid && usuarioCtrl.touched">
+            <div class="invalid-feedback">Ingresa tu nombre de usuario.</div>
+          </div>
 
-    <button type="submit" [disabled]="form.invalid || enviando()">
-      {{ enviando() ? 'Ingresando...' : 'Ingresar' }}
-    </button>
-  </form>
+          <div class="mb-2">
+            <label class="form-label" for="password">Contraseña</label>
+            <div class="input-group has-validation">
+              <input id="password" class="form-control" name="password"
+                     [type]="verPassword() ? 'text' : 'password'"
+                     required autocomplete="current-password"
+                     #passwordCtrl="ngModel" [(ngModel)]="password"
+                     [class.is-invalid]="passwordCtrl.invalid && passwordCtrl.touched">
+              <button type="button" class="btn btn-outline-secondary"
+                      [attr.aria-label]="verPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                      (click)="verPassword.set(!verPassword())">
+                <i class="bi" [class.bi-eye]="!verPassword()" [class.bi-eye-slash]="verPassword()"></i>
+              </button>
+              <div class="invalid-feedback">Ingresa tu contraseña.</div>
+            </div>
+          </div>
+
+          <div class="text-end mb-4">
+            <a routerLink="/recuperar" class="small">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          @if (error()) {
+            <div class="alert alert-danger py-2 small">
+              <i class="bi bi-exclamation-triangle me-1"></i>{{ error() }}
+            </div>
+          }
+
+          <button type="submit" class="btn btn-bb-primary w-100" [disabled]="enviando()">
+            @if (enviando()) {
+              <span class="spinner-border spinner-border-sm me-1"></span>Ingresando...
+            } @else {
+              Ingresar
+            }
+          </button>
+        </form>
+
+        <p class="text-center text-suave small mt-4 mb-0">
+          ¿No tienes cuenta? <a routerLink="/registro">Regístrate</a>
+        </p>
+      </div>
+    </div>
+  </div>
 </section>

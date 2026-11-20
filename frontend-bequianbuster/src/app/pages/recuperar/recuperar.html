@@ -1,0 +1,53 @@
+<section class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+      <div class="bb-panel p-4 p-md-5">
+
+        <div class="text-center mb-4">
+          <i class="bi bi-shield-lock fs-1 text-bb-acento"></i>
+          <h1 class="h3 mt-2 mb-1">Recuperar contraseña</h1>
+          <p class="text-suave small mb-0">Te enviaremos un enlace para crear una nueva contraseña</p>
+        </div>
+
+        @if (enviado()) {
+          <div class="alert alert-success small">
+            <i class="bi bi-envelope-check me-1"></i>
+            Si existe una cuenta asociada a <strong>{{ email }}</strong>, recibirás un correo con las
+            instrucciones para restablecer tu contraseña.
+          </div>
+          <a routerLink="/login" class="btn btn-bb-primary w-100">Volver a iniciar sesión</a>
+        } @else {
+          <form #f="ngForm" (ngSubmit)="enviar(f)" novalidate>
+            <div class="mb-4">
+              <label class="form-label" for="email">Correo electrónico</label>
+              <input id="email" type="email" class="form-control" name="email"
+                     required maxlength="120" [pattern]="patronEmail" placeholder="usuario@dominio.cl"
+                     #emailCtrl="ngModel" [(ngModel)]="email"
+                     [class.is-invalid]="emailCtrl.invalid && emailCtrl.touched">
+              <div class="invalid-feedback">
+                @if (emailCtrl.errors?.['required']) { Ingresa tu correo. }
+                @else { Ingresa un correo válido (ej: usuario@dominio.cl). }
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-bb-primary w-100" [disabled]="enviando()">
+              @if (enviando()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>Enviando...
+              } @else {
+                Enviar enlace
+              }
+            </button>
+          </form>
+
+          <p class="text-center small mt-4 mb-0">
+            <a routerLink="/login"><i class="bi bi-arrow-left me-1"></i>Volver a iniciar sesión</a>
+          </p>
+        }
+
+        <p class="text-center text-suave mt-4 mb-0" style="font-size: .75rem">
+          Funcionalidad simulada: no se envían correos reales.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,24 +1,55 @@
-<section class="detalle">
-  <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
+<section class="container">
+  <a routerLink="/catalogo" class="d-inline-block mb-4 text-decoration-none">
+    <i class="bi bi-arrow-left me-1"></i>Volver al catálogo
+  </a>
 
   @if (facade.cargando()) {
-    <p class="info">Cargando...</p>
+    <div class="text-center py-5">
+      <div class="spinner-border text-info" role="status"></div>
+    </div>
   } @else if (facade.error()) {
-    <p class="error">{{ facade.error() }}</p>
+    <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>{{ facade.error() }}</div>
   } @else if (facade.seleccionado(); as v) {
-    <h1>{{ v.titulo }}</h1>
 
-    <dl class="ficha">
-      <dt>ID</dt>             <dd>{{ v.id }}</dd>
-      <dt>Desarrollador</dt>  <dd>{{ v.desarrollador }}</dd>
-      <dt>Lanzamiento</dt>    <dd>{{ v.fechaLanzamiento }}</dd>
-      <dt>Plataforma</dt>     <dd>{{ v.plataforma }}</dd>
-      <dt>Género</dt>         <dd>{{ v.genero }}</dd>
-      <dt>Precio</dt>         <dd>{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</dd>
-      <dt>Stock</dt>          <dd>{{ v.stock }}</dd>
-      <dt>Imagen</dt>         <dd>{{ v.imagen ?? 'Sin imagen' }}</dd>
-    </dl>
+    <div class="row g-4 g-lg-5">
+      <!-- Carátula: ancho completo en móvil, 5/12 en tablet, 4/12 en escritorio -->
+      <div class="col-12 col-md-5 col-lg-4">
+        <div class="bb-portada-detalle">
+          <img [src]="v.imagen || 'logo.svg'" [alt]="'Carátula de ' + v.titulo" (error)="sinImagen($event)">
+        </div>
+      </div>
 
-    <p class="descripcion">{{ v.descripcion }}</p>
+      <!-- Información -->
+      <div class="col-12 col-md-7 col-lg-8">
+        <span class="badge bg-bb-acento mb-2">{{ v.plataforma }}</span>
+        <h1 class="display-6 mb-1">{{ v.titulo }}</h1>
+        <p class="text-suave">{{ v.desarrollador }}</p>
+
+        <p class="bb-precio-grande mb-3">{{ v.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</p>
+
+        <p class="lead fs-6 mb-4">{{ v.descripcion }}</p>
+
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-lg-3">
+            <div class="bb-dato"><small>Género</small><strong>{{ v.genero }}</strong></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="bb-dato"><small>Lanzamiento</small><strong>{{ v.fechaLanzamiento }}</strong></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="bb-dato"><small>Stock</small><strong>{{ v.stock > 0 ? v.stock + ' unid.' : 'Agotado' }}</strong></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="bb-dato"><small>Código</small><strong>#{{ v.id }}</strong></div>
+          </div>
+        </div>
+
+        @if (auth.esAdmin()) {
+          <a class="btn btn-outline-info" [routerLink]="['/admin/editar', v.id]">
+            <i class="bi bi-pencil me-1"></i>Editar videojuego
+          </a>
+        }
+      </div>
+    </div>
   }
 </section>

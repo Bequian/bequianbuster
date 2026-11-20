@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Videojuego, VideojuegoRequest } from '../models/videojuego';
 
+import { ItemCarrito } from '../models/carrito';
+
 /**
  * Servicio de acceso a ms-videojuegos.
  * Su única responsabilidad es la comunicación HTTP: no guarda estado
@@ -53,4 +55,11 @@ export class VideojuegoApi {
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}`);
   }
+
+  /** POST /videojuego/compra: descuenta el stock de los productos comprados. */
+  comprar(items: ItemCarrito[]): Observable<Videojuego[]> {
+    const cuerpo = { items: items.map(i => ({ id: i.videojuego.id, cantidad: i.cantidad })) };
+    return this.http.post<Videojuego[]>(`${this.url}/compra`, cuerpo);
+  }
+
 }

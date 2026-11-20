@@ -20,7 +20,7 @@ public record UserUpdateRequest(
      * La contraseña del usuario.
      */
     @Size(min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres")
-    @Pattern(regexp = ValidationRules.PASSWORD, message = "La contraseña debe incluir al menos una mayúscula, una minúscula y un número") 
+    @Pattern(regexp = ValidationRules.PASSWORD, message = "La contraseña debe incluir mayúscula, minúscula, número y un carácter especial, sin espacios") 
     String password,
 
     /**

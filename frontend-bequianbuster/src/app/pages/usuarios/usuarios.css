@@ -1,0 +1,11 @@
+.bb-indicador { display: flex; align-items: center; gap: .9rem; height: 100%; }
+.bb-indicador i { font-size: 1.8rem; color: var(--bb-acento); }
+.bb-indicador small { display: block; color: var(--bb-texto-suave); }
+.bb-indicador strong { font-family: "Rajdhani", sans-serif; font-size: 1.6rem; }
+
+.bb-tabla {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: rgba(139, 92, 246, .08);
+  --bs-table-border-color: var(--bb-borde);
+}
+.bb-tabla thead th { color: var(--bb-texto-suave); font-weight: 500; }

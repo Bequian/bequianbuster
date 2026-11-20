@@ -53,6 +53,7 @@ public class SecurityConfig {
             .authenticationProvider(provider)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/videojuego", "/videojuego/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/videojuego/compra").hasRole("CLIENTE")
                 .requestMatchers("/videojuego", "/videojuego/**").hasRole("ADMIN")
                 .anyRequest().denyAll()
             )

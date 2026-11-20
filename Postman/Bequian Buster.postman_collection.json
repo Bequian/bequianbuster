@@ -998,6 +998,492 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "ms-usuarios (Semana 5)",
+      "item": [
+        {
+          "name": "Crear Usuario - No Auth",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\":\"jugador1\",\r\n    \"email\":\"jugador1@duocplay.test\",\r\n    \"password\":\"Clave#2026\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/registro",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Usuario con rol ADMIN - Se guarda como CLIENTE",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\":\"jugador2\",\r\n    \"email\":\"jugador2@duocplay.test\",\r\n    \"password\":\"Clave#2026\",\r\n    \"rol\":\"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/registro",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Usuario - Password Invalida",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\":\"jugador3\",\r\n    \"email\":\"jugador1@duocplay.test\",\r\n    \"password\":\"Clave2026\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/registro",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Usuario Duplicado",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\":\"jugador1\",\r\n    \"email\":\"jugador1@duocplay.test\",\r\n    \"password\":\"Clave#2026\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/registro",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener cuenta - Autenticado",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{jugadorUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{jugadorPassword}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/cuenta",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "cuenta"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar Correo - Autenticado",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{jugadorUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{jugadorPassword}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"nuevo@duocplay.test\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/perfil",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "perfil"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar Password - Contraseña Actual Incorrecta",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{jugadorUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{jugadorPassword}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"nuevo@duocplay.test\",\r\n    \"passwordActual\":\"mala\",\r\n    \"passwordNueva\":\"Pass#2026\"\r\n}\t",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/perfil",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "perfil"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar Password - Contraseña Actual Correcta",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{jugadorUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{jugadorPassword}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"nuevo@duocplay.test\",\r\n    \"passwordActual\":\"Otra#2026\",\r\n    \"passwordNueva\":\"Pass#2026\"\r\n}\t",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{usuarios}}/auth/perfil",
+              "host": [
+                "{{usuarios}}"
+              ],
+              "path": [
+                "auth",
+                "perfil"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Videojuego como Cliente",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{cliente1User}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{cliente1Pass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"titulo\": \"The Witcher 2: Assassins of Kings Enhanced Edition\",\r\n    \"desarrollador\": \"CD Projekt Red\",\r\n    \"fechaLanzamiento\": \"17-04-2012\",\r\n    \"plataforma\": \"PC\",\r\n    \"genero\": \"Action RPG\",\r\n    \"descripcion\": \"Geralt de Rivia es acusado falsamente del asesinato del rey de Temeria. Para limpiar su nombre, deberá emprender una persecución implacable para descubrir la identidad del verdadero asesino de reyes en medio de una red de conspiraciones políticas.\",\r\n    \"precio\": 9990,\r\n    \"stock\": 35,\r\n    \"imagen\": \"img/videojuegos/the_witcher_2_EE.jpg\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{videojuegos}}/videojuego",
+              "host": [
+                "{{videojuegos}}"
+              ],
+              "path": [
+                "videojuego"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ms-videojuegos (Semana 5)",
+      "item": [
+        {
+          "name": "Compra como Admin",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{adminUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{adminPass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{videojuegos}}/videojuego/compra",
+              "host": [
+                "{{videojuegos}}"
+              ],
+              "path": [
+                "videojuego",
+                "compra"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Comprar cantidad superior a stock",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{cliente1User}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{cliente1Pass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\":[{\"id\":1,\"cantidad\":999}]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{videojuegos}}/videojuego/compra",
+              "host": [
+                "{{videojuegos}}"
+              ],
+              "path": [
+                "videojuego",
+                "compra"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Compra superior a stock de 2 juegos",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{cliente1User}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{cliente1Pass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\":[{\"id\":1,\"cantidad\":1},{\"id\":2,\"cantidad\":999}]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{videojuegos}}/videojuego/compra",
+              "host": [
+                "{{videojuegos}}"
+              ],
+              "path": [
+                "videojuego",
+                "compra"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Compra sin items",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{cliente1User}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{cliente1Pass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\":[]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{videojuegos}}/videojuego/compra",
+              "host": [
+                "{{videojuegos}}"
+              ],
+              "path": [
+                "videojuego",
+                "compra"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

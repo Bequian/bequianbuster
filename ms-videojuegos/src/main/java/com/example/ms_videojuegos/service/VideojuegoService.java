@@ -13,6 +13,12 @@ import com.example.ms_videojuegos.error.ResourceNotFoundException;
 import com.example.ms_videojuegos.model.Videojuego;
 import com.example.ms_videojuegos.repository.VideojuegoRepository;
 
+import java.util.ArrayList;
+
+import com.example.ms_videojuegos.dto.CompraRequest;
+import com.example.ms_videojuegos.dto.ItemCompra;
+import com.example.ms_videojuegos.error.StockInsuficienteException;
+
 /**
  * Servicio para gestionar videojuegos.
  * Proporciona métodos para listar, buscar, crear, actualizar y eliminar videojuegos.
@@ -137,6 +143,33 @@ public class VideojuegoService {
         Videojuego actual = buscarPorId(id);
         videojuegoRepository.delete(actual);
         log.info("Videojuego eliminado con id: {}", id);
+    }
+
+    /**
+    * Registra una compra descontando el stock de cada videojuego.
+    * Es transaccional: si un producto no tiene stock suficiente,
+    * se lanza una excepción y se revierte TODA la compra.
+    */
+    @Transactional
+    public List<Videojuego> comprar(CompraRequest compra) {
+        List<Videojuego> actualizados = new ArrayList<>();
+
+        for (ItemCompra item : compra.items()) {
+            Videojuego videojuego = buscarPorId(item.id());
+
+            if (videojuego.getStock() < item.cantidad()) {
+                throw new StockInsuficienteException(
+                    "Stock insuficiente para \"" + videojuego.getTitulo() + "\": disponible "
+                    + videojuego.getStock() + ", solicitado " + item.cantidad());
+            }
+
+            videojuego.setStock(videojuego.getStock() - item.cantidad());
+            actualizados.add(videojuego);
+        }
+
+        List<Videojuego> guardados = videojuegoRepository.saveAll(actualizados);
+        log.info("Compra registrada: {} producto(s)", guardados.size());
+        return guardados;
     }
     
 }

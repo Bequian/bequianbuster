@@ -5,6 +5,8 @@ import { Observable, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Perfil, Sesion } from '../models/sesion';
 
+import { Cuenta, PerfilDatos, RegistroDatos } from '../models/cuenta';
+
 const CLAVE_SESION = 'bb_sesion';
 
 /**
@@ -23,6 +25,7 @@ export class Auth {
   readonly sesion = this._sesion.asReadonly();
   readonly estaAutenticado = computed(() => this._sesion() !== null);
   readonly esAdmin = computed(() => this._sesion()?.rol === 'ADMIN');
+  readonly esCliente = computed(() => this._sesion()?.rol === 'CLIENTE');
 
   /** POST /auth/login con HTTP Basic. Si responde 200, guarda la sesión. */
   login(usuario: string, password: string): Observable<Sesion> {
@@ -38,6 +41,31 @@ export class Auth {
         credenciales: this.codificar(perfil.user, password)
       })),
       tap(sesion => this.guardarSesion(sesion))
+    );
+  }
+
+    /** POST /auth/registro (público): crea una cuenta CLIENTE. */
+  registrar(datos: RegistroDatos): Observable<Cuenta> {
+    return this.http.post<Cuenta>(`${environment.apiUsuarios}/auth/registro`, datos);
+  }
+
+  /** GET /auth/cuenta: datos completos de la cuenta propia. */
+  cuenta(): Observable<Cuenta> {
+    return this.http.get<Cuenta>(`${environment.apiUsuarios}/auth/cuenta`);
+  }
+
+  /**
+   * PUT /auth/perfil. Si se cambió la contraseña, se actualizan las
+   * credenciales guardadas; si no, las siguientes peticiones fallarían con 401.
+   */
+  actualizarPerfil(datos: PerfilDatos): Observable<Cuenta> {
+    return this.http.put<Cuenta>(`${environment.apiUsuarios}/auth/perfil`, datos).pipe(
+      tap(() => {
+        const sesion = this._sesion();
+        if (sesion && datos.passwordNueva) {
+          this.guardarSesion({ ...sesion, credenciales: this.codificar(sesion.usuario, datos.passwordNueva) });
+        }
+      })
     );
   }
 

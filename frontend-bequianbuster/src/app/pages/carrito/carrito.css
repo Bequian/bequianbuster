@@ -1,0 +1,28 @@
+.bb-item + .bb-item { border-top: 1px solid var(--bb-borde); }
+
+.bb-miniatura {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.bb-cantidad { max-width: 130px; }
+.bb-cantidad .form-control {
+  background: var(--bb-fondo-2);
+  border-color: var(--bb-borde);
+  color: var(--bb-texto);
+}
+.btn-outline-secondary { border-color: var(--bb-borde); color: var(--bb-texto-suave); }
+
+/* En escritorio, el resumen acompaña al usuario al hacer scroll */
+@media (min-width: 992px) {
+  .bb-resumen { position: sticky; top: 90px; }
+}
+
+.bb-total {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--bb-acento);
+}
