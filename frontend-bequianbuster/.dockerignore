@@ -1,0 +1,12 @@
+# Se reconstruyen dentro de la imagen
+node_modules/
+.angular/
+dist/
+
+# Archivos locales y sensibles
+.git
+.vscode/
+.env
+.env.*
+*.log
+coverage/
