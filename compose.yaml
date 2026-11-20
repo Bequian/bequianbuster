@@ -1,0 +1,58 @@
+# BequianBuster - Ejecución con Docker Compose
+# Uso: docker compose up --build -d
+
+name: bequianbuster
+
+services:
+
+  ms-usuarios:
+    build: ./ms-usuarios
+    image: bequianbuster/ms-usuarios:s5
+    container_name: bb-ms-usuarios
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      TNS_ADMIN: /opt/wallet
+      DB_USER: ${DB_USER:?Falta la variable DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD:?Falta la variable DB_PASSWORD}
+      BB_CORS_ORIGIN: http://localhost:4200
+    volumes:
+      - ${WALLET_DIR:?Falta WALLET_DIR en el archivo .env}:/opt/wallet:ro
+    networks:
+      - bb-red
+
+  ms-videojuegos:
+    build: ./ms-videojuegos
+    image: bequianbuster/ms-videojuegos:s5
+    container_name: bb-ms-videojuegos
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      TNS_ADMIN: /opt/wallet
+      DB_USER: ${DB_USER:?Falta la variable DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD:?Falta la variable DB_PASSWORD}
+      # Dentro de la red Docker, ms-usuarios se encuentra por su nombre
+      BB_USERS_URL: http://ms-usuarios:8081
+      BB_CORS_ORIGIN: http://localhost:4200
+    volumes:
+      - ${WALLET_DIR:?Falta WALLET_DIR en el archivo .env}:/opt/wallet:ro
+    depends_on:
+      - ms-usuarios
+    networks:
+      - bb-red
+
+  frontend:
+    build: ./frontend-bequianbuster
+    image: bequianbuster/frontend:s5
+    container_name: bb-frontend
+    ports:
+      - "127.0.0.1:4200:80"
+    depends_on:
+      - ms-usuarios
+      - ms-videojuegos
+    networks:
+      - bb-red
+
+networks:
+  bb-red:
+    name: bequianbuster-red

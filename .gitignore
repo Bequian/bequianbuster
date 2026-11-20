@@ -33,3 +33,9 @@ build/
 .vscode/
 BequianBuster_Entrega.zip
 Exp2_S4_Angelo_Benvenuto.zip
+
+# Configuración sensible (Docker)
+.env
+.env.*
+!.env.example
+**/Wallet_*/docker
