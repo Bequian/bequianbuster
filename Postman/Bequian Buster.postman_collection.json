@@ -1118,18 +1118,27 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "jugador1",
+                  "value": "{{jugadorUser}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Clave#2026",
+                  "value": "{{jugadorPassword}}",
                   "type": "string"
                 }
               ]
             },
             "method": "GET",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{usuarios}}/auth/cuenta",
               "host": [
@@ -1151,12 +1160,12 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "jugador1",
+                  "value": "{{jugadorUser}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Clave#2026",
+                  "value": "{{jugadorPassword}}",
                   "type": "string"
                 }
               ]
@@ -1193,12 +1202,12 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "jugador1",
+                  "value": "{{jugadorUser}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Clave#2026",
+                  "value": "{{jugadorPassword}}",
                   "type": "string"
                 }
               ]
@@ -1207,7 +1216,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\":\"nuevo@duocplay.test\",\r\n    \"passwordActual\":\"mala\",\r\n    \"passwordNueva\":\"Otra#2026\"\r\n}\t",
+              "raw": "{\r\n    \"email\":\"nuevo@duocplay.test\",\r\n    \"passwordActual\":\"mala\",\r\n    \"passwordNueva\":\"Pass#2026\"\r\n}\t",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1235,12 +1244,12 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "jugador1",
+                  "value": "{{jugadorUser}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Clave#2026",
+                  "value": "{{jugadorPassword}}",
                   "type": "string"
                 }
               ]
@@ -1249,7 +1258,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\":\"nuevo@duocplay.test\",\r\n    \"passwordActual\":\"Clave#2026\",\r\n    \"passwordNueva\":\"Otra#2026\"\r\n}\t",
+              "raw": "{\r\n    \"email\":\"nuevo@duocplay.test\",\r\n    \"passwordActual\":\"Otra#2026\",\r\n    \"passwordNueva\":\"Pass#2026\"\r\n}\t",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1277,12 +1286,12 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "cliente1",
+                  "value": "{{cliente1User}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Desk1984",
+                  "value": "{{cliente1Pass}}",
                   "type": "string"
                 }
               ]
@@ -1323,17 +1332,17 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "admin",
+                  "value": "{{adminUser}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Desk1984",
+                  "value": "{{adminPass}}",
                   "type": "string"
                 }
               ]
             },
-            "method": "GET",
+            "method": "POST",
             "header": [],
             "url": {
               "raw": "{{videojuegos}}/videojuego/compra",
@@ -1356,12 +1365,12 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "cliente1",
+                  "value": "{{cliente1User}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Desk1984",
+                  "value": "{{cliente1Pass}}",
                   "type": "string"
                 }
               ]
@@ -1370,7 +1379,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\"items\":[{\"id\":1,\"cantidad\":1},{\"id\":2,\"cantidad\":999}]}",
+              "raw": "{\"items\":[{\"id\":1,\"cantidad\":999}]}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1398,12 +1407,12 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "cliente1",
+                  "value": "{{cliente1User}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Desk1984",
+                  "value": "{{cliente1Pass}}",
                   "type": "string"
                 }
               ]
@@ -1440,12 +1449,12 @@
               "basic": [
                 {
                   "key": "username",
-                  "value": "cliente1",
+                  "value": "{{cliente1User}}",
                   "type": "string"
                 },
                 {
                   "key": "password",
-                  "value": "Desk1984",
+                  "value": "{{cliente1Pass}}",
                   "type": "string"
                 }
               ]

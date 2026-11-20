@@ -1,12 +1,24 @@
 # 🎮 BequianBuster – Sistema Full Stack de Videojuegos
 
-Aplicación Full Stack para gestionar el catálogo de videojuegos de una tienda y las cuentas de sus usuarios. Está compuesta por **dos microservicios Spring Boot** que persisten sus datos en una **Oracle Autonomous Database** (OCI) y un **frontend Angular** que consume sus APIs REST.
+Tienda de videojuegos Full Stack compuesta por **dos microservicios Spring Boot** con persistencia en **Oracle Autonomous Database** (OCI), un **frontend Angular** responsivo con Bootstrap y un **arquetipo Maven** propio. Toda la solución se ejecuta en contenedores con **Docker Compose**, usando **Nginx** como servidor del frontend y proxy hacia las APIs.
 
 > Desarrollo Full Stack 3 – Duoc UC.
 
 ---
 
 ## 📌 Historial de versiones
+
+### v5.0 – Semana 5: Docker y frontend completo (Sumativa 2)
+- **Dockerización**: Dockerfile multi-stage para ambos microservicios y para Angular + Nginx; `compose.yaml` con red propia, wallet montada como volumen de solo lectura y credenciales por variables de entorno.
+- **Nginx** sirve la SPA y actúa como proxy (`/api/videojuegos`, `/api/usuarios`): el navegador habla con un solo origen.
+- **Bootstrap 5** con grid de 12 columnas: diseño adaptable a móvil, tablet y escritorio; identidad visual propia (logo, paleta, tipografía y carátulas).
+- Pantallas nuevas: **registro**, **recuperar contraseña** (simulada), **mi perfil**, **carrito**, **checkout** y **gestión de usuarios**.
+- **6 reglas de contraseña**, iguales en backend y frontend, con una lista visual que se marca mientras el usuario escribe.
+- `ms-usuarios`: registro público como `CLIENTE` (`POST /auth/registro`), consulta (`GET /auth/cuenta`) y edición del perfil propio (`PUT /auth/perfil`).
+- `ms-videojuegos`: compra con pago simulado que **descuenta stock en Oracle** de forma transaccional (`POST /videojuego/compra`).
+- Patrón **Factory** en los guards por rol (`rolGuard`) y **directiva validadora** reutilizable para contraseñas.
+- **Pruebas unitarias** con JUnit 5 y Mockito para las reglas de negocio de ambos microservicios.
+- Desarrollo en ramas `feature/s5-docker` y `feature/s5-frontend`, integradas por *pull request*.
 
 ### v4.0 – Semana 4: Arquetipo Maven y reconstrucción del microservicio
 - Arquetipo Maven propio **`bb-microservicio-archetype`** (versiones 1.0.0 y 1.1.0), creado a partir del proyecto base `bb-base`.
@@ -56,22 +68,27 @@ Aplicación Full Stack para gestionar el catálogo de videojuegos de una tienda 
 ## 🏗️ Arquitectura
 
 ```
-        ┌──────────────────────────────┐
-        │  frontend-bequianbuster      │  :4200  (Angular)
-        │  navegador del usuario       │
-        └───────┬──────────────┬───────┘
-                │ HTTP + JSON  │ HTTP + JSON
-                ▼              ▼
-     ┌──────────────────┐   ┌──────────────────┐
-     │  ms-videojuegos  │──►│   ms-usuarios    │
-     │  :8080 catálogo  │   │  :8081 identidad │
-     └────────┬─────────┘   └────────┬─────────┘
-              │  GET /auth/perfil     │
-              ▼                       ▼
-       ┌─────────────────────────────────────┐
-       │  Oracle Autonomous Database (OCI)   │
-       │     bb_videojuego · bb_usuarios     │
-       └─────────────────────────────────────┘
+                 Navegador
+          http://localhost:4200
+                    │
+   ┌────────────────┴────────────────┐   red Docker: bequianbuster-red
+   │  frontend (Nginx :80)           │
+   │  · sirve la aplicación Angular  │
+   │  · /api/videojuegos/ ──┐        │
+   │  · /api/usuarios/   ───┼──┐     │
+   └────────────────────────┼──┼─────┘
+                            ▼  ▼
+         ┌──────────────────┐   ┌──────────────────┐
+         │  ms-videojuegos  │──►│   ms-usuarios    │
+         │  :8080 catálogo  │   │  :8081 identidad │
+         └────────┬─────────┘   └────────┬─────────┘
+                  │  GET /auth/perfil     │
+                  ▼                       ▼
+           ┌─────────────────────────────────────┐
+           │  Oracle Autonomous Database (OCI)   │
+           │     bb_videojuego · bb_usuarios     │
+           └─────────────────────────────────────┘
+              (wallet montada en /opt/wallet)
 ```
 
 Cada microservicio es dueño de su propia tabla. `ms-videojuegos` **no consulta** la tabla de usuarios: le pide a `ms-usuarios` que valide las credenciales y le devuelva el rol.
@@ -103,6 +120,10 @@ Cada microservicio es dueño de su propia tabla. `ms-videojuegos` **no consulta*
 | Angular | 22 |
 | TypeScript | 6 |
 | Node.js / npm | LTS |
+| Bootstrap / Bootstrap Icons | 5.3 / 1.13 |
+| Docker Desktop / Docker Compose | 4.99 / v5 |
+| Nginx | stable-alpine |
+| JUnit 5 / Mockito / AssertJ | Pruebas unitarias |
 
 ---
 
@@ -110,6 +131,8 @@ Cada microservicio es dueño de su propia tabla. `ms-videojuegos` **no consulta*
 
 ```
 bequianbuster/
+├── compose.yaml                   # Orquestación de los 3 contenedores
+├── .env.example                   # Plantilla de variables (el .env real no se sube)
 ├── arquetipos/
 │   ├── bb-base/                       # Proyecto origen del arquetipo
 │   └── bb-microservicio-archetype/    # Arquetipo Maven (plantillas)
@@ -118,7 +141,13 @@ bequianbuster/
 │   ├── Bequian Buster.postman_collection.json
 │   └── Entorno BB.postman_environment.json   # Plantilla sin contraseñas
 ├── frontend-bequianbuster/        # Angular – puerto 4200
+│   ├── Dockerfile                 # Node 24 (build) + Nginx (ejecución)
+│   ├── nginx.conf                 # SPA + proxy hacia las APIs
+│   ├── public/covers/             # Carátulas de los videojuegos
 │   └── src/app
+│       ├── components/            # ReglasPassword (reutilizable)
+│       ├── guards/                # adminGuard, authGuard, rolGuard (Factory)
+│       ├── validators/            # Reglas de contraseña y directiva PasswordSegura
 │       ├── models/                # Videojuego, Sesion, ErrorResponse
 │       ├── services/              # VideojuegoApi (HTTP), Auth (sesión)
 │       ├── facades/               # CatalogoFacade (patrón Facade)
@@ -129,6 +158,7 @@ bequianbuster/
 │   ├── crear_videojuegos.sql      # Tabla bb_videojuego + 10 registros
 │   └── crear_usuarios.sql         # Tabla bb_usuarios
 ├── ms-videojuegos/                # Puerto 8080
+│   ├── Dockerfile                 # Maven (build) + JRE 21 (ejecución)
 │   └── src/main/java/com/example/ms_videojuegos
 │       ├── controller/            # VideojuegoController
 │       ├── dto/                   # VideojuegoRequest / VideojuegoResponse
@@ -138,6 +168,7 @@ bequianbuster/
 │       ├── security/              # SecurityConfig, RemoteUserProvider, RemoteProfile
 │       └── service/               # VideojuegoService
 └── ms-usuarios/                   # Puerto 8081
+    ├── Dockerfile                 # Maven (build) + JRE 21 (ejecución)
     └── src/main/java/com/example/ms_usuarios
         ├── config/                # InitUsers (carga inicial de cuentas)
         ├── controller/            # AuthController, UserController, EstadoController
@@ -172,25 +203,71 @@ El modelo incluye además `plataforma`, `descripcion`, `precio`, `stock` e `imag
 
 ### Pantallas y operaciones
 
+### Pantallas y operaciones
+
 | Pantalla | Ruta | Operación | Acceso |
 |---|---|---|---|
 | Catálogo y búsqueda | `/catalogo` | `GET /videojuego` y `/videojuego/buscar` | Público |
 | Detalle | `/videojuego/:id` | `GET /videojuego/{id}` | Público |
-| Nuevo videojuego | `/admin/nuevo` | `POST /videojuego` | `ADMIN` |
-| Editar videojuego | `/admin/editar/:id` | `PUT /videojuego/{id}` | `ADMIN` |
-| Eliminar (desde el catálogo) | — | `DELETE /videojuego/{id}` | `ADMIN` |
-| Login | `/login` | `POST :8081/auth/login` | Público |
+| Inicio de sesión | `/login` | `POST /auth/login` | Público |
+| Registro | `/registro` | `POST /auth/registro` + login automático | Público |
+| Recuperar contraseña | `/recuperar` | Simulado (sin servicio de correo) | Público |
+| Mi perfil | `/perfil` | `GET /auth/cuenta` y `PUT /auth/perfil` | Autenticado |
+| Carrito | `/carrito` | Lista en memoria (señales) | `CLIENTE` |
+| Checkout | `/checkout` | `POST /videojuego/compra` (pago simulado) | `CLIENTE` |
+| Nuevo / editar videojuego | `/admin/nuevo`, `/admin/editar/:id` | `POST` / `PUT /videojuego` | `ADMIN` |
+| Eliminar videojuego | Desde el catálogo | `DELETE /videojuego/{id}` | `ADMIN` |
+| Gestión de usuarios | `/admin/usuarios` | `GET`, `PUT` y `DELETE /usuarios` | `ADMIN` |
 
-Las URLs de los microservicios están centralizadas en `src/environments/`.
+### Roles
+
+| Rol | Funcionalidades |
+|---|---|
+| Visitante | Catálogo, búsqueda, detalle, registro y recuperar contraseña |
+| `CLIENTE` | Lo anterior + carrito, compra simulada y mi perfil |
+| `ADMIN` | Lo anterior (sin carrito) + CRUD de videojuegos y gestión de usuarios (indicadores, filtros, cambio de rol y eliminación) |
+
+### Diseño responsivo (grid de 12 columnas)
+
+| Pantalla | Breakpoint | Catálogo | Navegación |
+|---|---|---|---|
+| Móvil | < 576 px | 1 columna (`col-12`) | Menú hamburguesa |
+| Tablet | ≥ 576 px | 2 columnas (`col-sm-6`) | Menú hamburguesa |
+| Laptop | ≥ 992 px | 3 columnas (`col-lg-4`) | Barra completa |
+| Escritorio | ≥ 1200 px | 4 columnas (`col-xl-3`) | Barra completa |
+
+La gestión de usuarios muestra una tabla desde 768 px y tarjetas en móvil (`d-none d-md-block` / `d-md-none`).
+
+### Identidad visual
+
+- **Logo** propio en SVG (`public/logo.svg`), también usado como ícono de la pestaña.
+- **Paleta** en variables CSS (`--bb-primario` violeta, `--bb-acento` cian, fondo oscuro), definida en `src/styles.css`.
+- **Tipografías:** Rajdhani para títulos y marca, Inter para el texto.
+- **Carátulas** de los videojuegos en `public/covers/`, con el logo como respaldo si una imagen no carga.
+
+### Validaciones de formularios
+
+Todos los formularios validan con HTML y Angular (`required`, `minlength`, `maxlength`, `pattern`, `min`, `max`), marcan los campos inválidos con Bootstrap (`is-invalid`) y muestran también los errores por campo que devuelve el backend.
+
+**Reglas de contraseña** (registro y cambio de contraseña), las mismas que valida `ms-usuarios`:
+
+1. Entre 8 y 72 caracteres
+2. Al menos una letra mayúscula
+3. Al menos una letra minúscula
+4. Al menos un número
+5. Al menos un carácter especial
+6. Sin espacios en blanco
 
 ### Patrones de diseño aplicados
 
 | Patrón | Dónde | Problema que resuelve |
 |---|---|---|
-| **MVC** (arquetipo) | `models/` (Modelo), `pages/` (Vista), `facades/` + `services/` (Controlador) | Separa los datos, la presentación y la lógica, para que cada archivo tenga una sola responsabilidad |
+| **MVC** (arquetipo) | `models/` (Modelo), `pages/` (Vista), `facades/` + `services/` (Controlador) | Separa los datos, la presentación y la lógica |
 | **Facade** | `facades/catalogo-facade.ts` | Los componentes llaman métodos simples (`cargar`, `buscar`, `guardar`, `eliminar`) sin conocer HTTP, URLs, conversión de fechas ni códigos de error |
-| **Observer** | `Observable` de `HttpClient` en `services/videojuego-api.ts` y señales (`signal`) en la fachada | Los componentes reaccionan automáticamente cuando llegan los datos o cambia el estado |
-| **Singleton** | Servicios con `providedIn: 'root'` (`VideojuegoApi`, `Auth`, `CatalogoFacade`) | Una única instancia compartida del acceso a la API y de la sesión |
+| **Observer** | `Observable` de `HttpClient` y señales (`signal`, `computed`) en fachada, sesión y carrito | Las vistas se actualizan solas cuando cambian los datos (por ejemplo, el contador del carrito en la barra) |
+| **Singleton** | Servicios con `providedIn: 'root'` (`VideojuegoApi`, `Auth`, `Carrito`, `CatalogoFacade`) | Una única instancia compartida de la sesión, el carrito y el acceso a las APIs |
+| **Factory** | `guards/rol-guard.ts` → `rolGuard('ADMIN')`, `rolGuard('CLIENTE')` | Crea guards por rol desde una sola función, en vez de duplicar un guard por cada rol |
+| **Directiva validadora** | `validators/password-segura.ts` + `components/reglas-password` | Las reglas de contraseña se definen una vez y se reutilizan en registro y perfil |
 
 ### Flujo de una operación
 
@@ -206,7 +283,7 @@ Ejemplo, al crear un videojuego:
 ### Seguridad en el frontend
 
 - `authInterceptor` envía las credenciales solo a las URLs de los microservicios.
-- `adminGuard` impide entrar a `/admin/*` si el usuario no es `ADMIN`.
+- `authGuard` protege las páginas que requieren sesión, y `rolGuard('ADMIN' | 'CLIENTE')` las de cada rol.
 - Ocultar botones y proteger rutas mejora la experiencia, pero **la seguridad real está en el backend**: un `CLIENTE` recibe **403** aunque intente llamar a la API directamente.
 
 ## 🧬 Arquetipo Maven `bb-microservicio-archetype`
@@ -351,6 +428,9 @@ Reconstrucción del microservicio de la Semana 1, **generado con `bb-microservic
 | POST | `/videojuego` | `ADMIN` | 201 / 400 / 401 / 403 |
 | PUT | `/videojuego/{id}` | `ADMIN` | 200 / 400 / 401 / 403 / 404 |
 | DELETE | `/videojuego/{id}` | `ADMIN` | 204 / 401 / 403 / 404 |
+| POST | `/videojuego/compra` | `CLIENTE` | 200 / 400 / 401 / 403 / 404 / 409 |
+
+**Compra transaccional:** `POST /videojuego/compra` recibe `{"items":[{"id":1,"cantidad":2}]}` y descuenta el stock de cada producto dentro de una transacción (`@Transactional`). Si un producto no tiene stock suficiente, responde **409** y no se descuenta ninguno.
 
 ### Ejemplo de body (POST / PUT)
 
@@ -390,7 +470,7 @@ Las expresiones regulares están centralizadas en `dto/ValidationRules.java` y s
 |---|---|---|---|
 | username | 3 a 50 caracteres, comienza con letra; admite letras, números, `.`, `-`, `_` | `cliente3` | `1usuario`, `ab` |
 | email | Formato `usuario@dominio.ext`, máximo 120 caracteres | `cliente3@duoc.cl` | `cliente3@duoc` |
-| password | 8 a 72 caracteres, con al menos una mayúscula, una minúscula y un número | `Clave2026` | `12345678`, `clave` |
+| password | 8 a 72 caracteres, con mayúscula, minúscula, número y carácter especial, sin espacios | `Clave#2026` | `Clave2026`, `clave #26` |
 | rol | `ADMIN` o `CLIENTE` (sin distinguir mayúsculas) | `cliente` | `VENDEDOR` |
 
 > El máximo de 72 caracteres en la contraseña se debe a que **BCrypt solo procesa los primeros 72 bytes**.
@@ -423,6 +503,9 @@ Si un dato no cumple las reglas, la API responde **400 Bad Request** con el deta
 | POST | `/usuarios` | `ADMIN` | Crea una cuenta (201 / 400 / 409 si ya existe) |
 | PUT | `/usuarios/{id}` | `ADMIN` | Actualiza email, contraseña o rol |
 | DELETE | `/usuarios/{id}` | `ADMIN` | Elimina una cuenta (204) |
+| POST | `/auth/registro` | Público | Registro propio, siempre como `CLIENTE` (201 / 400 / 409) |
+| GET | `/auth/cuenta` | Autenticado | Datos de la cuenta propia |
+| PUT | `/auth/perfil` | Autenticado | Cambia el correo y, confirmando la contraseña actual, la contraseña |
 
 **Reglas de negocio:** no se permite duplicar username o email, ni quitar o eliminar al último `ADMIN` (responde **409 Conflict**).
 
@@ -481,7 +564,9 @@ BB_CORS_ORIGIN "http://localhost:4200"
 
 ## ▶️ Ejecución
 
-Levantar primero `ms-usuarios`, porque `ms-videojuegos` depende de él para autenticar.
+**Opción recomendada:** Docker Compose (ver la sección 🐳 Ejecución con Docker).
+
+**Desarrollo local**, sin contenedores. Levantar primero `ms-usuarios`, porque `ms-videojuegos` depende de él para autenticar:
 
 ```powershell
 cd ms-usuarios
@@ -493,15 +578,15 @@ cd ms-videojuegos
 .\mvnw.cmd spring-boot:run
 ```
 
-También se pueden iniciar desde el **Spring Boot Dashboard** de VSCode.
-
-Con los dos microservicios en ejecución, levantar el frontend:
+Luego el frontend (usa `environment.development.ts`, con las URLs de `localhost`):
 
 ```powershell
 cd frontend-bequianbuster
 npm install      # solo la primera vez
 ng serve
 ```
+
+> Durante el desarrollo del frontend se pueden mantener los microservicios en Docker y detener solo el contenedor del frontend (`docker compose stop frontend`), porque `ng serve` y Nginx usan el mismo puerto 4200.
 
 Abrir `http://localhost:4200`.
 
