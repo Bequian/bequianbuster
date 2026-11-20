@@ -1,0 +1,14 @@
+# Compilaciones locales: la imagen compila desde cero
+target/
+
+# Maven Wrapper: no se usa dentro de Docker
+.mvn/
+mvnw
+mvnw.cmd
+
+# Archivos locales y sensibles
+.git
+.env
+.env.*
+*.log
+HELP.md
